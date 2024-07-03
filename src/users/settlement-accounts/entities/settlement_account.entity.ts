@@ -1,7 +1,7 @@
 import { IsNumber, IsString } from 'class-validator';
 import { BaseModel } from 'src/common/entities';
-import { Column, Entity, OneToMany } from 'typeorm';
-import { UserModel } from './user.entity';
+import { UserModel } from 'src/users/entities';
+import { Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm';
 
 @Entity()
 export class SettlementAccountModel extends BaseModel {
@@ -17,6 +17,9 @@ export class SettlementAccountModel extends BaseModel {
   @IsString()
   account_holder: string;
 
-  @OneToMany(() => UserModel, (user) => user.settlement_account)
+  @OneToOne(() => UserModel, (user) => user.settlement_account)
+  @JoinColumn({
+    name: 'user_id',
+  })
   user: UserModel;
 }

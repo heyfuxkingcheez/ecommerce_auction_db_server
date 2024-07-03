@@ -1,7 +1,7 @@
 import { IsCreditCard, IsDate, IsString } from 'class-validator';
 import { BaseModel } from 'src/common/entities';
 import { Column, Entity, ManyToOne } from 'typeorm';
-import { PaymentInfoModel } from './payment_info.entity';
+import { PaymentInfoModel } from '../../entities/payment_info.entity';
 
 @Entity()
 export class CardInfoModel extends BaseModel {

@@ -7,11 +7,11 @@ import {
   Length,
 } from 'class-validator';
 import { BaseModel } from 'src/common/entities';
-import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
+import { Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm';
 import { RolesEnum } from '../const';
-import { PaymentInfoModel } from './payment_info.entity';
-import { AddressBookModel } from './address_book.entity';
-import { SettlementAccountModel } from './settlement_account.entity';
+import { PaymentInfoModel } from '../payment-infos/entities/payment_info.entity';
+import { AddressBookModel } from '../address-books/entities/address_book.entity';
+import { SettlementAccountModel } from '../settlement-accounts/entities/settlement_account.entity';
 
 @Entity()
 export class UserModel extends BaseModel {
@@ -50,9 +50,9 @@ export class UserModel extends BaseModel {
   @OneToMany(() => AddressBookModel, (addressBook) => addressBook.user)
   address_books: AddressBookModel[];
 
-  @OneToMany(
+  @OneToOne(
     () => SettlementAccountModel,
     (settlementAccount) => settlementAccount.user,
   )
-  settlement_account: SettlementAccountModel[];
+  settlement_account: SettlementAccountModel;
 }

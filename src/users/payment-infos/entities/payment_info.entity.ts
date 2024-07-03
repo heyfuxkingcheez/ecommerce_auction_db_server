@@ -1,7 +1,7 @@
 import { BaseModel } from 'src/common/entities';
-import { Entity, ManyToOne, OneToMany } from 'typeorm';
-import { UserModel } from './user.entity';
-import { CardInfoModel } from './card_info.entity';
+import { UserModel } from 'src/users/entities';
+import { Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import { CardInfoModel } from '../card-infos/entities/card_info.entity';
 
 @Entity()
 export class PaymentInfoModel extends BaseModel {

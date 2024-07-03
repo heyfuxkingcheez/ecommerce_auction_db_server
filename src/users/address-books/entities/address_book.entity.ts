@@ -1,7 +1,7 @@
 import { IsNumber, IsString } from 'class-validator';
 import { BaseModel } from 'src/common/entities';
+import { UserModel } from 'src/users/entities';
 import { Column, Entity, ManyToOne } from 'typeorm';
-import { UserModel } from './user.entity';
 
 @Entity()
 export class AddressBookModel extends BaseModel {
