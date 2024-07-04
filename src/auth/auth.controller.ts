@@ -19,4 +19,26 @@ export class AuthController {
   postRegisterEmail(@Body() dto: RegisterUserDto) {
     return this.authService.registerWithEmail(dto);
   }
+
+  @Post('token/access')
+  postTokenAccess(@Headers('authorization') rawToken: string) {
+    const token = this.authService.extractTokenFromHeader(rawToken, true);
+
+    const newToken = this.authService.rotateToken(token, false);
+
+    return {
+      accessToken: newToken,
+    };
+  }
+
+  @Post('token/refresh')
+  postTokenRefresh(@Headers('authorization') rawToken: string) {
+    const token = this.authService.extractTokenFromHeader(rawToken, true);
+
+    const newToken = this.authService.rotateToken(token, true);
+
+    return {
+      refreshToken: newToken,
+    };
+  }
 }

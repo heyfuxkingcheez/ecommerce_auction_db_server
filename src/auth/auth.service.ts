@@ -13,6 +13,7 @@ export class AuthService {
     private readonly configService: ConfigService,
     private readonly usersService: UsersService,
   ) {}
+
   async registerWithEmail(user: RegisterUserDto) {
     const hashRounds = this.configService.get<number>('HASH_ROUNDS');
 
@@ -102,5 +103,24 @@ export class AuthService {
         ? this.configService.get<string>('JWT_REFRESH_EXP')
         : this.configService.get<string>('JWT_ACCESS_EXP'),
     });
+  }
+
+  rotateToken(token: string, isRefreshToken: boolean) {
+    const decoded = this.jwtService.verify(token, {
+      secret: this.configService.get<string>('JWT_SECRET'),
+    });
+
+    if (decoded.type !== 'refresh') {
+      throw new UnauthorizedException(
+        '토큰 재발급은 refresh 토큰으로만 가능합니다.',
+      );
+    }
+
+    return this.signToken(
+      {
+        ...decoded,
+      },
+      isRefreshToken,
+    );
   }
 }
