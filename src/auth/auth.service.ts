@@ -15,7 +15,7 @@ export class AuthService {
   ) {}
 
   async registerWithEmail(user: RegisterUserDto) {
-    const hashRounds = this.configService.get<number>('HASH_ROUNDS');
+    const hashRounds = this.configService.get<string>('HASH_ROUNDS');
 
     const hash = bcrypt.hashSync(user.password, +hashRounds);
 
@@ -40,7 +40,7 @@ export class AuthService {
     const prefix = isBearer ? 'Bearer' : 'Basic';
 
     if (splitToken.length !== 2 || splitToken[0] !== prefix) {
-      throw new UnauthorizedException('잘못된 토큰 입니다.');
+      throw new UnauthorizedException('잘못된 토큰입니다.');
     }
 
     const token = splitToken[1];
@@ -122,5 +122,16 @@ export class AuthService {
       },
       isRefreshToken,
     );
+  }
+
+  verifyToken(token: string) {
+    try {
+      return this.jwtService.verify(token, {
+        secret: this.configService.get<string>('JWT_SECRET'),
+      });
+    } catch (error) {
+      console.log(error);
+      throw new UnauthorizedException('잘못된 토큰입니다.');
+    }
   }
 }

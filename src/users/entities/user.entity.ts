@@ -12,29 +12,55 @@ import { RolesEnum } from '../const';
 import { PaymentInfoModel } from '../payment-infos/entities/payment_info.entity';
 import { AddressBookModel } from '../address-books/entities/address_book.entity';
 import { SettlementAccountModel } from '../settlement-accounts/entities/settlement_account.entity';
+import {
+  emailValidationMessage,
+  lengthValidationMessage,
+  numberValidationMessage,
+  stringValidationMessage,
+} from 'src/common/validation-message';
 
 @Entity()
 export class UserModel extends BaseModel {
   @Column({ length: 20, unique: true, nullable: false })
-  @IsString()
-  @Length(1, 20)
+  @IsString({
+    message: stringValidationMessage,
+  })
+  @Length(1, 20, {
+    message: lengthValidationMessage,
+  })
   nickname: string;
 
   @Column({ unique: true, nullable: false })
-  @IsString()
-  @IsEmail()
+  @IsString({
+    message: stringValidationMessage,
+  })
+  @IsEmail(
+    {},
+    {
+      message: emailValidationMessage,
+    },
+  )
   email: string;
 
   @Column({ nullable: false })
-  @IsString()
-  @Length(8, 20)
+  @IsString({
+    message: stringValidationMessage,
+  })
+  @Length(8, 20, {
+    message: lengthValidationMessage,
+  })
   // @Exclude({
   //   toPlainOnly: true,
   // })
   password: string;
 
   @Column({ unique: true, nullable: false })
-  @IsNumber()
+  @IsNumber(
+    {},
+    {
+      message: numberValidationMessage,
+    },
+  )
   @IsPhoneNumber()
   phone_number: number;
 
