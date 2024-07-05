@@ -1,11 +1,4 @@
 import { Exclude } from 'class-transformer';
-import {
-  IsEmail,
-  IsNumber,
-  IsPhoneNumber,
-  IsString,
-  Length,
-} from 'class-validator';
 import { BaseModel } from 'src/common/entities';
 import { Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm';
 import { RolesEnum } from '../const';
@@ -18,6 +11,13 @@ import {
   numberValidationMessage,
   stringValidationMessage,
 } from 'src/common/validation-message';
+import {
+  IsEmail,
+  IsNumber,
+  IsPhoneNumber,
+  IsString,
+  Length,
+} from 'class-validator';
 
 @Entity()
 export class UserModel extends BaseModel {
@@ -49,20 +49,19 @@ export class UserModel extends BaseModel {
   @Length(8, 20, {
     message: lengthValidationMessage,
   })
-  // @Exclude({
-  //   toPlainOnly: true,
-  // })
+  @Exclude({
+    toPlainOnly: true,
+  })
   password: string;
 
   @Column({ unique: true, nullable: false })
-  @IsNumber(
-    {},
-    {
-      message: numberValidationMessage,
-    },
-  )
-  @IsPhoneNumber()
-  phone_number: number;
+  @IsString({
+    message: stringValidationMessage,
+  })
+  @IsPhoneNumber('KR', {
+    message: '휴대폰 번호 형식이 아닙니다.',
+  })
+  phone_number: string;
 
   @Column({
     enum: Object.values(RolesEnum),
