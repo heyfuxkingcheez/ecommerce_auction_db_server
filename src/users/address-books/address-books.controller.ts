@@ -1,6 +1,9 @@
 import {
   Body,
   Controller,
+  Delete,
+  Get,
+  Param,
   ParseUUIDPipe,
   Post,
   UseGuards,
@@ -9,23 +12,47 @@ import { AddressBooksService } from './address-books.service';
 import { CreateAddressDto } from './dto/createAddress.dto';
 import { User } from '../decorator/user.decorator';
 import { AddressBookModel } from './entities/address_book.entity';
-import { AccessTokenGuard } from 'src/auth/guard/bearer-token.guard';
 
 @Controller('users/address_books')
 export class AddressBooksController {
-  constructor(private readonly addressBooksService: AddressBooksService) {}
+  constructor(
+    private readonly addressBooksService: AddressBooksService,
+  ) {}
 
   @Post()
-  @UseGuards(AccessTokenGuard)
-  async postAddressById(
+  async postAddress(
     @User('id', ParseUUIDPipe) userId: string,
     @Body() dto: CreateAddressDto,
   ): Promise<AddressBookModel> {
-    const address = await this.addressBooksService.createAddressById(
-      userId,
-      dto,
-    );
+    const address =
+      await this.addressBooksService.createAddress(
+        userId,
+        dto,
+      );
 
-    return this.addressBooksService.getAddressById(address.id);
+    return this.addressBooksService.getAddressById(
+      address.id,
+      userId,
+    );
+  }
+
+  @Get()
+  async getAddressListById(
+    @User('id', ParseUUIDPipe) userId: string,
+  ): Promise<AddressBookModel[]> {
+    return this.addressBooksService.getAddressListById(
+      userId,
+    );
+  }
+
+  @Delete(':addressId')
+  async deleteAddressById(
+    @User('id', ParseUUIDPipe) userId: string,
+    @Param('addressId', ParseUUIDPipe) addressId: string,
+  ) {
+    return this.addressBooksService.deleteAddressById(
+      userId,
+      addressId,
+    );
   }
 }

@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserModel } from './entities';
-import { Repository } from 'typeorm';
+import { QueryRunner, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -24,6 +24,12 @@ export class UsersService {
     private readonly userRepository: Repository<UserModel>,
     private readonly configService: ConfigService,
   ) {}
+  getRepository(qr?: QueryRunner) {
+    return qr
+      ? qr.manager.getRepository<UserModel>(UserModel)
+      : this.userRepository;
+  }
+
   async createUser(
     user: Pick<
       UserModel,

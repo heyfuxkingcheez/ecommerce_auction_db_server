@@ -9,7 +9,6 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './decorator/user.decorator';
-import { FileInterceptor } from '@nestjs/platform-express';
 import { UserModel } from './entities';
 import { UpdateUserDto } from './dto/update-user.dto';
 
