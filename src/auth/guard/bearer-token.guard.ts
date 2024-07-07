@@ -16,13 +16,14 @@ export class BearerTokenGuard implements CanActivate {
     private readonly usersService: UsersService,
     private readonly reflector: Reflector,
   ) {}
-  async canActivate(context: ExecutionContext): Promise<boolean> {
-    const isPublic = this.reflector.getAllAndOverride(IS_PUBLIC_KEY, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
 
-    console.log(isPublic);
+  async canActivate(
+    context: ExecutionContext,
+  ): Promise<boolean> {
+    const isPublic = this.reflector.getAllAndOverride(
+      IS_PUBLIC_KEY,
+      [context.getHandler(), context.getClass()],
+    );
 
     const req = context.switchToHttp().getRequest();
 
@@ -33,13 +34,22 @@ export class BearerTokenGuard implements CanActivate {
 
     const rawToken = req.headers['authorization'];
 
-    if (!rawToken) throw new UnauthorizedException('토큰이 존재하지 않습니다.');
+    if (!rawToken)
+      throw new UnauthorizedException(
+        '토큰이 존재하지 않습니다.',
+      );
 
-    const token = this.authService.extractTokenFromHeader(rawToken, true);
+    const token = this.authService.extractTokenFromHeader(
+      rawToken,
+      true,
+    );
 
-    const result = await this.authService.verifyToken(token);
+    const result =
+      await this.authService.verifyToken(token);
 
-    const user = await this.usersService.getUserByEmail(result.email);
+    const user = await this.usersService.getUserByEmail(
+      result.email,
+    );
 
     req.user = user;
     req.token = token;
@@ -51,7 +61,9 @@ export class BearerTokenGuard implements CanActivate {
 
 @Injectable()
 export class AccessTokenGuard extends BearerTokenGuard {
-  async canActivate(context: ExecutionContext): Promise<boolean> {
+  async canActivate(
+    context: ExecutionContext,
+  ): Promise<boolean> {
     await super.canActivate(context);
 
     const req = context.switchToHttp().getRequest();
@@ -59,7 +71,9 @@ export class AccessTokenGuard extends BearerTokenGuard {
     if (req.isRoutePublic) return true;
 
     if (req.tokenType !== 'access')
-      throw new UnauthorizedException('Access Token이 아닙니다.');
+      throw new UnauthorizedException(
+        'Access Token이 아닙니다.',
+      );
 
     return true;
   }
@@ -67,7 +81,9 @@ export class AccessTokenGuard extends BearerTokenGuard {
 
 @Injectable()
 export class RefreshTokenGuard extends BearerTokenGuard {
-  async canActivate(context: ExecutionContext): Promise<boolean> {
+  async canActivate(
+    context: ExecutionContext,
+  ): Promise<boolean> {
     await super.canActivate(context);
 
     const req = context.switchToHttp().getRequest();
@@ -75,7 +91,9 @@ export class RefreshTokenGuard extends BearerTokenGuard {
     if (req.isRoutePublic) return true;
 
     if (req.tokenType !== 'refresh')
-      throw new UnauthorizedException('Refresh Token이 아닙니다.');
+      throw new UnauthorizedException(
+        'Refresh Token이 아닙니다.',
+      );
 
     return true;
   }

@@ -14,6 +14,6 @@ import { UsersModule } from '../users.module';
   ],
   controllers: [AddressBooksController],
   providers: [AddressBooksService],
-  exports: [AddressBooksService],
+  exports: [],
 })
 export class AddressBooksModule {}

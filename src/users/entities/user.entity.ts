@@ -1,6 +1,12 @@
 import { Exclude } from 'class-transformer';
 import { BaseModel } from 'src/common/entities';
-import { Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToMany,
+  OneToOne,
+} from 'typeorm';
 import { RolesEnum } from '../const';
 import { PaymentInfoModel } from '../payment-infos/entities/payment_info.entity';
 import { AddressBookModel } from '../address-books/entities/address_book.entity';
@@ -49,9 +55,9 @@ export class UserModel extends BaseModel {
   @Length(8, 20, {
     message: lengthValidationMessage,
   })
-  @Exclude({
-    toPlainOnly: true,
-  })
+  // @Exclude({
+  //   toPlainOnly: true,
+  // })
   password: string;
 
   @Column({ unique: true, nullable: false })
@@ -69,10 +75,21 @@ export class UserModel extends BaseModel {
   })
   role: RolesEnum;
 
-  @OneToMany(() => PaymentInfoModel, (PaymentInfo) => PaymentInfo.user)
+  @Column({
+    nullable: true,
+  })
+  image?: string;
+
+  @OneToMany(
+    () => PaymentInfoModel,
+    (PaymentInfo) => PaymentInfo.user,
+  )
   payment_infos: PaymentInfoModel[];
 
-  @OneToMany(() => AddressBookModel, (addressBook) => addressBook.user)
+  @OneToMany(
+    () => AddressBookModel,
+    (addressBook) => addressBook.user,
+  )
   address_books: AddressBookModel[];
 
   @OneToOne(

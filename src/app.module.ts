@@ -1,8 +1,14 @@
-import { ClassSerializerInterceptor, Module } from '@nestjs/common';
+import {
+  ClassSerializerInterceptor,
+  Module,
+} from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import {
+  ConfigModule,
+  ConfigService,
+} from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { CommonModule } from './common/common.module';
@@ -10,7 +16,8 @@ import { PaymentInfosModule } from './users/payment-infos/payment-infos.module';
 import { CardInfosModule } from './users/payment-infos/card-infos/card-infos.module';
 import { AddressBooksModule } from './users/address-books/address-books.module';
 import { SettlementAccountsModule } from './users/settlement-accounts/settlement-accounts.module';
-import { APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { AccessTokenGuard } from './auth/guard/bearer-token.guard';
 
 @Module({
   imports: [
@@ -29,7 +36,8 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_DATABASE'),
         autoLoadEntities: true,
-        synchronize: configService.get<string>('RUNTIME') !== 'prod',
+        synchronize:
+          configService.get<string>('RUNTIME') !== 'prod',
       }),
     }),
     AuthModule,
@@ -46,6 +54,10 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
     {
       provide: APP_INTERCEPTOR,
       useClass: ClassSerializerInterceptor,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: AccessTokenGuard,
     },
   ],
 })
