@@ -1,4 +1,4 @@
-import { Exclude } from 'class-transformer';
+import { Exclude, Transform } from 'class-transformer';
 import { BaseModel } from 'src/common/entities';
 import {
   Column,
@@ -24,6 +24,9 @@ import {
   IsString,
   Length,
 } from 'class-validator';
+import { join } from 'path';
+import { USER_PUBLIC_PROFILE_IMAGE_PATH } from 'src/common/const/path.const';
+import { DEFAULT_PROFILE_IAMGE } from 'src/common/const/default_value.const';
 
 @Entity()
 export class UserModel extends BaseModel {
@@ -77,7 +80,14 @@ export class UserModel extends BaseModel {
 
   @Column({
     nullable: true,
+    default: DEFAULT_PROFILE_IAMGE,
   })
+  @IsString()
+  @Transform(
+    ({ value }) =>
+      value &&
+      `/${join(USER_PUBLIC_PROFILE_IMAGE_PATH, value)}`,
+  )
   image?: string;
 
   @OneToMany(

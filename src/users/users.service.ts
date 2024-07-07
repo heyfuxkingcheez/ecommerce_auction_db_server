@@ -8,6 +8,14 @@ import { UserModel } from './entities';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
+import { UpdateUserDto } from './dto/update-user.dto';
+import {
+  PUBLIC_FOLDER_PATH,
+  TEMP_FOLDER_PATH,
+  USER_PROFILE_IMAGE_PATH,
+} from 'src/common/const/path.const';
+import { basename, join } from 'path';
+import { promises } from 'fs';
 
 @Injectable()
 export class UsersService {
@@ -106,9 +114,8 @@ export class UsersService {
     userId: string,
     dto: Pick<
       UserModel,
-      'nickname' | 'password' | 'phone_number'
+      'image' | 'nickname' | 'password' | 'phone_number'
     >,
-    file?: string,
   ) {
     const user = await this.getUserById(userId);
 
@@ -132,10 +139,30 @@ export class UsersService {
       await this.existPhoneNumber(dto.phone_number);
       user.phone_number = dto.phone_number;
     }
-    if (file) user.image = file;
+    if (dto.image) user.image = dto.image;
 
     const updatedUserProfile =
       await this.userRepository.save(user);
     return updatedUserProfile;
+  }
+
+  async createUserImage(dto: UpdateUserDto) {
+    const tempFilePath = join(TEMP_FOLDER_PATH, dto.image);
+
+    try {
+      await promises.access(tempFilePath);
+    } catch (error) {
+      throw new BadRequestException(
+        '파일이 존재하지 않습니다.',
+      );
+    }
+
+    const fileName = basename(tempFilePath);
+
+    const newPath = join(USER_PROFILE_IMAGE_PATH, fileName);
+
+    await promises.rename(tempFilePath, newPath);
+
+    return true;
   }
 }
