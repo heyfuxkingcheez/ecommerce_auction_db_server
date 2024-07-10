@@ -8,9 +8,8 @@ import {
   OneToOne,
 } from 'typeorm';
 
-
 @Entity()
-export class PaymentInfoModel extends BaseModel {
-  @ManyToOne(() => UserModel, (user) => user.payment_infos)
+export class PaymentsModel extends BaseModel {
+  @ManyToOne(() => UserModel, (user) => user.payments)
   user: UserModel;
 }

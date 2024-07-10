@@ -8,7 +8,6 @@ import {
   OneToOne,
 } from 'typeorm';
 import { RolesEnum } from '../const';
-import { PaymentInfoModel } from '../payment-infos/entities/payment_info.entity';
 import { AddressBookModel } from '../address-books/entities/address_book.entity';
 import { SettlementAccountModel } from '../settlement-accounts/entities/settlement_account.entity';
 import {
@@ -27,6 +26,7 @@ import {
 import { join } from 'path';
 import { USER_PUBLIC_PROFILE_IMAGE_PATH } from 'src/common/const/path.const';
 import { DEFAULT_PROFILE_IAMGE } from 'src/common/const/default_value.const';
+import { PaymentsModel } from '../payments/entities/payments.entity';
 
 @Entity()
 export class UserModel extends BaseModel {
@@ -90,11 +90,8 @@ export class UserModel extends BaseModel {
   )
   image?: string;
 
-  @OneToMany(
-    () => PaymentInfoModel,
-    (PaymentInfo) => PaymentInfo.user,
-  )
-  payment_infos: PaymentInfoModel[];
+  @OneToMany(() => PaymentsModel, (Payment) => Payment.user)
+  payments: PaymentsModel[];
 
   @OneToMany(
     () => AddressBookModel,
