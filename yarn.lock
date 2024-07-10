@@ -870,6 +870,11 @@
   resolved "https://registry.yarnpkg.com/@sqltools/formatter/-/formatter-1.2.5.tgz#3abc203c79b8c3e90fd6c156a0c62d5403520e12"
   integrity sha512-Uy0+khmZqUrUGm5dmMqVlnvufZRSK0FbYzVgp0UMstm+F5+W2/jnEEQyc9vo1ZR/E5ZI/B1WjjoTqBqwJL6Krw==
 
+"@tosspayments/tosspayments-sdk@^2.2.1":
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/@tosspayments/tosspayments-sdk/-/tosspayments-sdk-2.2.1.tgz#433becf7526cd2b5b410d92ba22a57feee296a4b"
+  integrity sha512-AJXo/zlYGk4dnXp0VTyySCf/Q39Q1HMgr3OLrz39zF2awFAbobm9q8twHCfEp6Imb9XplivIvmFmFBLEhU94rQ==
+
 "@tsconfig/node10@^1.0.7":
   version "1.0.11"
   resolved "https://registry.yarnpkg.com/@tsconfig/node10/-/node10-1.0.11.tgz#6ee46400685f130e278128c7b38b7e031ff5b2f2"

@@ -122,7 +122,9 @@ export class UsersService {
       UserModel,
       'image' | 'nickname' | 'password' | 'phone_number'
     >,
+    qr?: QueryRunner,
   ) {
+    const repo = this.getRepository(qr);
     const user = await this.getUserById(userId);
 
     if (!user) throw new NotFoundException();
@@ -147,12 +149,14 @@ export class UsersService {
     }
     if (dto.image) user.image = dto.image;
 
-    const updatedUserProfile =
-      await this.userRepository.save(user);
+    const updatedUserProfile = await repo.save(user);
     return updatedUserProfile;
   }
 
-  async createUserImage(dto: UpdateUserDto) {
+  async createUserImage(
+    dto: UpdateUserDto,
+    qr?: QueryRunner,
+  ) {
     const tempFilePath = join(TEMP_FOLDER_PATH, dto.image);
 
     try {

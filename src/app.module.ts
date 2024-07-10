@@ -13,13 +13,14 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { CommonModule } from './common/common.module';
 import { PaymentInfosModule } from './users/payment-infos/payment-infos.module';
-import { CardInfosModule } from './users/payment-infos/card-infos/card-infos.module';
 import { AddressBooksModule } from './users/address-books/address-books.module';
 import { SettlementAccountsModule } from './users/settlement-accounts/settlement-accounts.module';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { AccessTokenGuard } from './auth/guard/bearer-token.guard';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { PUBLIC_FOLDER_PATH } from './common/const/path.const';
+import { LogInterceptor } from './common/interceptor/log.interceptor';
+import { TosspaymentsModule } from './tosspayments/tosspayments.module';
 
 @Module({
   imports: [
@@ -50,9 +51,9 @@ import { PUBLIC_FOLDER_PATH } from './common/const/path.const';
     UsersModule,
     CommonModule,
     PaymentInfosModule,
-    CardInfosModule,
     AddressBooksModule,
     SettlementAccountsModule,
+    TosspaymentsModule,
   ],
   controllers: [AppController],
   providers: [
@@ -60,6 +61,10 @@ import { PUBLIC_FOLDER_PATH } from './common/const/path.const';
     {
       provide: APP_INTERCEPTOR,
       useClass: ClassSerializerInterceptor,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LogInterceptor,
     },
     {
       provide: APP_GUARD,

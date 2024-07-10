@@ -4,6 +4,7 @@ import {
   Headers,
   Post,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterUserDto } from './dto/registerUser.dto';
