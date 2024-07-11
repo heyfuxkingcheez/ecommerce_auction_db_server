@@ -21,6 +21,7 @@ import { PUBLIC_FOLDER_PATH } from './common/const/path.const';
 import { LogInterceptor } from './common/interceptor/log.interceptor';
 import { PaymentsModule } from './payments/payment.module';
 import { RolesGuard } from './users/guard/roles.guard';
+import { ItemsModule } from './items/items.module';
 
 @Module({
   imports: [
@@ -53,6 +54,7 @@ import { RolesGuard } from './users/guard/roles.guard';
     PaymentsModule,
     AddressBooksModule,
     SettlementAccountsModule,
+    ItemsModule,
   ],
   controllers: [AppController],
   providers: [
