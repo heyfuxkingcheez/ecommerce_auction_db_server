@@ -1,34 +1,29 @@
 import { IsNumber, IsString } from 'class-validator';
 import { BaseModel } from 'src/common/entities';
+import { stringValidationMessage } from 'src/common/validation-message';
 import { UserModel } from 'src/users/entities';
+import internal from 'stream';
 import {
   Column,
   Entity,
   JoinColumn,
+  ManyToOne,
   OneToMany,
   OneToOne,
 } from 'typeorm';
 
 @Entity()
-export class SettlementAccountModel extends BaseModel {
+export class PaymentsModel extends BaseModel {
   @Column({ nullable: false })
-  @IsString()
-  bank_name: string;
-
-  @Column({ nullable: false })
-  @IsString()
-  account_number: string;
-
-  @Column({ nullable: false })
-  @IsString()
-  account_holder: string;
-
-  @OneToOne(
-    () => UserModel,
-    (user) => user.settlement_account,
-  )
-  @JoinColumn({
-    name: 'user_id',
+  @IsString({
+    message: stringValidationMessage,
   })
+  payment_key: string;
+
+  @Column({ nullable: false })
+  @IsNumber()
+  amount: number;
+
+  @ManyToOne(() => UserModel, (user) => user.payments)
   user: UserModel;
 }

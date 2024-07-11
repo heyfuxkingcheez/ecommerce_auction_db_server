@@ -1,4 +1,7 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from './../users/users.service';
@@ -15,11 +18,15 @@ export class AuthService {
   ) {}
 
   async registerWithEmail(user: RegisterUserDto) {
-    const hashRounds = this.configService.get<string>('HASH_ROUNDS');
+    const hashRounds =
+      this.configService.get<string>('HASH_ROUNDS');
 
-    const hash = bcrypt.hashSync(user.password, +hashRounds);
+    const hash = bcrypt.hashSync(
+      user.password,
+      +hashRounds,
+    );
 
-    const newUser = await this.usersService.createUser({
+    const newUser = await this.usersService.signupUser({
       ...user,
       password: hash,
     });
@@ -34,12 +41,18 @@ export class AuthService {
     };
   }
 
-  extractTokenFromHeader(header: string, isBearer: boolean) {
+  extractTokenFromHeader(
+    header: string,
+    isBearer: boolean,
+  ) {
     const splitToken = header.split(' ');
 
     const prefix = isBearer ? 'Bearer' : 'Basic';
 
-    if (splitToken.length !== 2 || splitToken[0] !== prefix) {
+    if (
+      splitToken.length !== 2 ||
+      splitToken[0] !== prefix
+    ) {
       throw new UnauthorizedException('잘못된 토큰입니다.');
     }
 
@@ -49,12 +62,17 @@ export class AuthService {
   }
 
   decodeBasicToken(base64String: string) {
-    const decoded = Buffer.from(base64String, 'base64').toString('utf-8');
+    const decoded = Buffer.from(
+      base64String,
+      'base64',
+    ).toString('utf-8');
 
     const split = decoded.split(':');
 
     if (split.length !== 2)
-      throw new UnauthorizedException('잘못된 유형의 토큰 입니다');
+      throw new UnauthorizedException(
+        '잘못된 유형의 토큰 입니다',
+      );
 
     const email = split[0];
     const password = split[1];
@@ -68,10 +86,13 @@ export class AuthService {
   async authenticateWithEmailAndPassword(
     user: Pick<UserModel, 'email' | 'password'>,
   ) {
-    const existingUser = await this.usersService.getUserByEmail(user.email);
+    const existingUser =
+      await this.usersService.getUserByEmail(user.email);
 
     if (!existingUser)
-      throw new UnauthorizedException('존재하지 않는 사용자 입니다.');
+      throw new UnauthorizedException(
+        '존재하지 않는 사용자 입니다.',
+      );
 
     const comparePassword = bcrypt.compareSync(
       user.password,
@@ -79,18 +100,26 @@ export class AuthService {
     );
 
     if (!comparePassword)
-      throw new UnauthorizedException('비밀번호가 일치하지 않습니다.');
+      throw new UnauthorizedException(
+        '비밀번호가 일치하지 않습니다.',
+      );
 
     return existingUser;
   }
 
-  async loginWithEmail(user: Pick<UserModel, 'email' | 'password'>) {
-    const existingUser = await this.authenticateWithEmailAndPassword(user);
+  async loginWithEmail(
+    user: Pick<UserModel, 'email' | 'password'>,
+  ) {
+    const existingUser =
+      await this.authenticateWithEmailAndPassword(user);
 
     return this.loginUser(existingUser);
   }
 
-  signToken(user: Pick<UserModel, 'email' | 'id'>, isRefreshToken: boolean) {
+  signToken(
+    user: Pick<UserModel, 'email' | 'id'>,
+    isRefreshToken: boolean,
+  ) {
     const payload = {
       email: user.email,
       id: user.id,
@@ -127,7 +156,8 @@ export class AuthService {
   verifyToken(token: string) {
     try {
       return this.jwtService.verify(token, {
-        secret: this.configService.get<string>('JWT_SECRET'),
+        secret:
+          this.configService.get<string>('JWT_SECRET'),
       });
     } catch (error) {
       console.log(error);

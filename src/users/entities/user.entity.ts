@@ -26,7 +26,7 @@ import {
 import { join } from 'path';
 import { USER_PUBLIC_PROFILE_IMAGE_PATH } from 'src/common/const/path.const';
 import { DEFAULT_PROFILE_IAMGE } from 'src/common/const/default_value.const';
-import { PaymentsModel } from '../payments/entities/payments.entity';
+import { PaymentsModel } from '../../payments/entities/payments.entity';
 
 @Entity()
 export class UserModel extends BaseModel {

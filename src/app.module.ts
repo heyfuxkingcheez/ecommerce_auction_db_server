@@ -12,7 +12,6 @@ import {
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { CommonModule } from './common/common.module';
-
 import { AddressBooksModule } from './users/address-books/address-books.module';
 import { SettlementAccountsModule } from './users/settlement-accounts/settlement-accounts.module';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
@@ -20,8 +19,7 @@ import { AccessTokenGuard } from './auth/guard/bearer-token.guard';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { PUBLIC_FOLDER_PATH } from './common/const/path.const';
 import { LogInterceptor } from './common/interceptor/log.interceptor';
-import { TosspaymentsModule } from './tosspayments/tosspayments.module';
-import { PaymentsModule } from './users/payments/payment.module';
+import { PaymentsModule } from './payments/payment.module';
 
 @Module({
   imports: [
@@ -54,7 +52,6 @@ import { PaymentsModule } from './users/payments/payment.module';
     PaymentsModule,
     AddressBooksModule,
     SettlementAccountsModule,
-    TosspaymentsModule,
   ],
   controllers: [AppController],
   providers: [

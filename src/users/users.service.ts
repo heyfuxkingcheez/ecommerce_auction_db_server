@@ -30,7 +30,7 @@ export class UsersService {
       : this.userRepository;
   }
 
-  async createUser(
+  async signupUser(
     user: Pick<
       UserModel,
       'email' | 'nickname' | 'password' | 'phone_number'
