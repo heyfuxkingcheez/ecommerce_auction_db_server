@@ -20,6 +20,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { PUBLIC_FOLDER_PATH } from './common/const/path.const';
 import { LogInterceptor } from './common/interceptor/log.interceptor';
 import { PaymentsModule } from './payments/payment.module';
+import { RolesGuard } from './users/guard/roles.guard';
 
 @Module({
   imports: [
@@ -67,6 +68,10 @@ import { PaymentsModule } from './payments/payment.module';
     {
       provide: APP_GUARD,
       useClass: AccessTokenGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
     },
   ],
 })
