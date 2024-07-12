@@ -23,6 +23,7 @@ export class TransactionInterceptor
     const qr = this.dataSource.createQueryRunner();
     await qr.connect();
     await qr.startTransaction();
+    console.log('TS Start!');
 
     req.queryRunner = qr;
 
@@ -30,12 +31,14 @@ export class TransactionInterceptor
       catchError(async (e) => {
         await qr.rollbackTransaction();
         await qr.release();
+        console.log('TS END!');
 
         throw new InternalServerErrorException(e.message);
       }),
       tap(async () => {
         await qr.commitTransaction();
         await qr.release();
+        console.log('TS END!');
       }),
     );
   }

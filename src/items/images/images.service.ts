@@ -38,6 +38,7 @@ export class ImagesService {
     try {
       await promises.access(tempFilePath);
     } catch (error) {
+      console.log(error);
       throw new BadRequestException(
         '존재하지 않는 파일 입니다.',
       );
@@ -60,12 +61,13 @@ export class ImagesService {
       existImages.order = dto.order;
       existImages.path = dto.path;
       existImages.type = dto.type;
+      await repo.update(
+        { id: existImages.id, order: dto.order },
+        existImages,
+      );
+    } else {
+      await repo.save({ ...dto });
     }
-
-    const result = await repo.save(existImages);
-
-    await promises.rename(tempFilePath, newPath);
-
-    return result;
+    return await promises.rename(tempFilePath, newPath);
   }
 }

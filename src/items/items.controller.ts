@@ -20,7 +20,6 @@ import { ImageModelType } from 'src/common/entities/image.entity';
 import { TransactionInterceptor } from 'src/common/interceptor/transaction.interceptor';
 import { QueryRunner } from 'src/common/decorator/query-runner.decorator';
 import { QueryRunner as QR } from 'typeorm';
-import { Request } from 'express';
 
 @Controller('items')
 export class ItemsController {
@@ -30,10 +29,9 @@ export class ItemsController {
   ) {}
 
   @Post()
-  @UseInterceptors(TransactionInterceptor)
   @Roles(RolesEnum.ADMIN)
+  @UseInterceptors(TransactionInterceptor)
   async postItem(
-    @Req() req: Request,
     @Body() dto: CreateItemDto,
     @QueryRunner() qr?: QR,
   ) {
@@ -55,8 +53,8 @@ export class ItemsController {
   }
 
   @Patch(':itemId')
-  @UseInterceptors(TransactionInterceptor)
   @Roles(RolesEnum.ADMIN)
+  @UseInterceptors(TransactionInterceptor)
   async patchItem(
     @Body() dto: UpdateItemDto,
     @Param('itemId') itemId: string,
@@ -69,15 +67,18 @@ export class ItemsController {
     );
 
     for (let i = 0; i < dto.images.length; i++) {
-      await this.imagesService.createItemImage({
-        item,
-        order: i,
-        path: dto.images[i],
-        type: ImageModelType.ITEM_IMAGE,
-      });
+      await this.imagesService.createItemImage(
+        {
+          item,
+          order: i,
+          path: dto.images[i],
+          type: ImageModelType.ITEM_IMAGE,
+        },
+        qr,
+      );
     }
 
-    return this.itemsService.getItemByItemId(itemId);
+    return this.itemsService.getItemByItemId(itemId, qr);
   }
 
   @Delete(':itemId')
