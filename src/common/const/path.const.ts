@@ -12,6 +12,8 @@ export const USERS_FOLDER_NAME = 'users';
 // 임시 폴더 이름
 export const TEMP_FOLDER_NAME = 'temp';
 
+export const ITEM_FOLDER_NAME = 'items';
+
 // 실제 공개폴더의 절대 경로
 // {프로젝트의 위치}/public
 export const PUBLIC_FOLDER_PATH = join(
@@ -24,6 +26,11 @@ export const PUBLIC_FOLDER_PATH = join(
 export const USER_PROFILE_IMAGE_PATH = join(
   PUBLIC_FOLDER_PATH,
   USERS_FOLDER_NAME,
+);
+
+export const ITEM_IMAGE_PATH = join(
+  PUBLIC_FOLDER_PATH,
+  ITEM_FOLDER_NAME,
 );
 
 // 절대경로 x

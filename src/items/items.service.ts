@@ -1,11 +1,10 @@
 import {
-  BadGatewayException,
   BadRequestException,
   Injectable,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ItemModel } from './entities/item.entity';
-import { Repository } from 'typeorm';
+import { QueryRunner, Repository } from 'typeorm';
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
 
@@ -16,19 +15,30 @@ export class ItemsService {
     private readonly itemRepository: Repository<ItemModel>,
   ) {}
 
-  async postItem(dto: CreateItemDto) {
-    const existItem = await this.existItemBymodelNumber(
-      dto.model_number,
-    );
-
-    if (existItem)
-      throw new BadRequestException(
-        '이미 등록된 상품 입니다.',
+  async postItem(
+    dto: CreateItemDto,
+    qr?: QueryRunner,
+  ): Promise<ItemModel> {
+    const repo = this.getRepository(qr);
+    try {
+      const existItem = await this.existItemBymodelNumber(
+        dto.model_number,
       );
 
-    const newItem = this.itemRepository.create(dto);
+      if (existItem)
+        throw new BadRequestException(
+          '이미 등록된 상품 입니다.',
+        );
 
-    return await this.itemRepository.save(newItem);
+      const newItem = repo.create({
+        ...dto,
+        images: [],
+      });
+
+      return await repo.save(newItem);
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async existItemBymodelNumber(modelNumber: string) {
@@ -39,8 +49,10 @@ export class ItemsService {
     });
   }
 
-  async getItemByItemId(itemId: string) {
-    const item = await this.itemRepository.findOne({
+  async getItemByItemId(itemId: string, qr?: QueryRunner) {
+    const repo = this.getRepository(qr);
+
+    const item = await repo.findOne({
       where: {
         id: itemId,
       },
@@ -54,7 +66,11 @@ export class ItemsService {
     return item;
   }
 
-  async patchItem(itemId: string, dto: UpdateItemDto) {
+  async patchItem(
+    itemId: string,
+    dto: UpdateItemDto,
+    qr?: QueryRunner,
+  ): Promise<ItemModel> {
     const item = await this.getItemByItemId(itemId);
 
     if (dto.item_name_en)
@@ -68,6 +84,8 @@ export class ItemsService {
     if (dto.release_price)
       item.release_price = dto.release_price;
 
+    // return this.itemRepository.update({ id: itemId }, dto);
+
     return await this.itemRepository.save(item);
   }
 
@@ -75,5 +93,11 @@ export class ItemsService {
     await this.getItemByItemId(itemId);
 
     return await this.itemRepository.delete({ id: itemId });
+  }
+
+  getRepository(qr?: QueryRunner) {
+    return qr
+      ? qr.manager.getRepository<ItemModel>(ItemModel)
+      : this.itemRepository;
   }
 }

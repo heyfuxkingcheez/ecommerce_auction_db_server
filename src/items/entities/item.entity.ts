@@ -4,7 +4,8 @@ import {
   IsString,
 } from 'class-validator';
 import { BaseModel } from 'src/common/entities';
-import { Column, Entity } from 'typeorm';
+import { ImageModel } from 'src/common/entities/image.entity';
+import { Column, Entity, OneToMany } from 'typeorm';
 
 @Entity()
 export class ItemModel extends BaseModel {
@@ -29,4 +30,7 @@ export class ItemModel extends BaseModel {
   })
   @IsDate()
   release_date: Date;
+
+  @OneToMany((type) => ImageModel, (image) => image.item)
+  images: ImageModel[];
 }
