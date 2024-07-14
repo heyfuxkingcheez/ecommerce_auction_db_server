@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserModel } from './entities';
@@ -61,19 +62,33 @@ export class UsersService {
   }
 
   async getUserByEmail(email: string) {
-    return this.userRepository.findOne({
+    const user = await this.userRepository.findOne({
       where: {
         email,
       },
     });
+
+    if (!user)
+      throw new UnauthorizedException(
+        '유효하지 않은 사용자입니다.',
+      );
+
+    return user;
   }
 
   async getUserById(userId: string) {
-    return this.userRepository.findOne({
+    const user = await this.userRepository.findOne({
       where: {
         id: userId,
       },
     });
+
+    if (!user)
+      throw new UnauthorizedException(
+        '유효하지 않은 사용자입니다.',
+      );
+
+    return user;
   }
 
   async existNickname(nickname: string): Promise<boolean> {

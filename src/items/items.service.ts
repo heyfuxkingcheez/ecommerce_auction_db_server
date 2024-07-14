@@ -14,6 +14,9 @@ export class ItemsService {
     @InjectRepository(ItemModel)
     private readonly itemRepository: Repository<ItemModel>,
   ) {}
+  async getAllItems() {
+    return await this.itemRepository.find();
+  }
 
   async postItem(
     dto: CreateItemDto,
@@ -71,6 +74,8 @@ export class ItemsService {
     dto: UpdateItemDto,
     qr?: QueryRunner,
   ): Promise<ItemModel> {
+    const repo = this.getRepository(qr);
+
     const item = await this.getItemByItemId(itemId);
 
     if (dto.item_name_en)
@@ -84,9 +89,9 @@ export class ItemsService {
     if (dto.release_price)
       item.release_price = dto.release_price;
 
-    // return this.itemRepository.update({ id: itemId }, dto);
+    // return this.itemRepository.update({ id: itemId }, item);
 
-    return await this.itemRepository.save(item);
+    return await repo.save(item);
   }
 
   async deleteItem(itemId: string) {

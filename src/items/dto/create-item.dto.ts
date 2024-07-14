@@ -1,6 +1,10 @@
 import { PickType } from '@nestjs/mapped-types';
 import { ItemModel } from '../entities/item.entity';
-import { IsOptional, IsString } from 'class-validator';
+import {
+  ArrayMaxSize,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class CreateItemDto extends PickType(ItemModel, [
   'item_name_kr',
@@ -13,5 +17,6 @@ export class CreateItemDto extends PickType(ItemModel, [
     each: true,
   })
   @IsOptional()
+  @ArrayMaxSize(3)
   images: string[];
 }

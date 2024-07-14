@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -45,6 +46,11 @@ export class AuthService {
     header: string,
     isBearer: boolean,
   ) {
+    if (!header)
+      throw new BadRequestException(
+        '토큰이 존재하지 않습니다.',
+      );
+
     const splitToken = header.split(' ');
 
     const prefix = isBearer ? 'Bearer' : 'Basic';

@@ -14,14 +14,15 @@ import { Roles } from 'src/users/decorator/roles.decorator';
 import { RolesEnum } from 'src/users/const';
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
-import { CommonService } from './../common/common.service';
 import { ImagesService } from './images/images.service';
 import { ImageModelType } from 'src/common/entities/image.entity';
 import { TransactionInterceptor } from 'src/common/interceptor/transaction.interceptor';
 import { QueryRunner } from 'src/common/decorator/query-runner.decorator';
 import { QueryRunner as QR } from 'typeorm';
+import { IsPublic } from 'src/common/decorator/is-public.decorator';
 
 @Controller('items')
+@Roles(RolesEnum.ADMIN)
 export class ItemsController {
   constructor(
     private readonly itemsService: ItemsService,
@@ -29,7 +30,6 @@ export class ItemsController {
   ) {}
 
   @Post()
-  @Roles(RolesEnum.ADMIN)
   @UseInterceptors(TransactionInterceptor)
   async postItem(
     @Body() dto: CreateItemDto,
@@ -53,7 +53,6 @@ export class ItemsController {
   }
 
   @Patch(':itemId')
-  @Roles(RolesEnum.ADMIN)
   @UseInterceptors(TransactionInterceptor)
   async patchItem(
     @Body() dto: UpdateItemDto,
@@ -82,11 +81,16 @@ export class ItemsController {
   }
 
   @Delete(':itemId')
-  @Roles(RolesEnum.ADMIN)
   async deleteItem(@Param('itemId') itemId: string) {
     return await this.itemsService.deleteItem(itemId);
   }
 
   @Get()
-  async getItems() {}
+  @IsPublic()
+  async getItems() {
+    return await this.itemsService.getAllItems();
+  }
+
+  @Post('/option/:itemId')
+  async postItemOption() {}
 }

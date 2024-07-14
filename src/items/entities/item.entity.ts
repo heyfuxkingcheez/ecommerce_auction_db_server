@@ -6,9 +6,15 @@ import {
 import { BaseModel } from 'src/common/entities';
 import { ImageModel } from 'src/common/entities/image.entity';
 import { Column, Entity, OneToMany } from 'typeorm';
+import { ItemOptionModel } from './item-option.entitiy';
 
 @Entity()
 export class ItemModel extends BaseModel {
+  @Column({
+    generated: 'increment',
+  })
+  item_number: number;
+
   @Column()
   @IsString()
   item_name_kr: string;
@@ -33,4 +39,10 @@ export class ItemModel extends BaseModel {
 
   @OneToMany((type) => ImageModel, (image) => image.item)
   images: ImageModel[];
+
+  @OneToMany(
+    (type) => ItemOptionModel,
+    (itemOption) => itemOption.item,
+  )
+  itemOptions: ItemOptionModel[];
 }

@@ -6,6 +6,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { TEMP_FOLDER_PATH } from './common/const/path.const';
 import { scheduleJob } from 'node-schedule';
+import { HttpExceptionFilter } from './common/exception-filter/http.exception-filter';
 
 function deleteOldFiles() {
   const files = fs.readdirSync(TEMP_FOLDER_PATH);
@@ -41,6 +42,8 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService);
   const port = configService.get<number>('PORT');
+
+  app.useGlobalFilters(new HttpExceptionFilter());
 
   await app.listen(port);
   console.log(`SERVER ON ${port}`);
