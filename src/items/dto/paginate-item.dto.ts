@@ -7,11 +7,19 @@ import {
 export class PaginateItemDto {
   @IsNumber()
   @IsOptional()
+  page?: number;
+
+  @IsNumber()
+  @IsOptional()
   where__itemNumber_more_than?: number;
 
-  @IsIn(['ASC'])
+  @IsNumber()
   @IsOptional()
-  order__createdAt: 'ASC' = 'ASC';
+  where__itemNumber_less_than?: number;
+
+  @IsIn(['ASC', 'DESC'])
+  @IsOptional()
+  order__createdAt: 'ASC' | 'DESC' = 'ASC';
 
   @IsNumber()
   @IsOptional()

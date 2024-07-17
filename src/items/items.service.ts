@@ -4,7 +4,13 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ItemModel } from './entities/item.entity';
-import { MoreThan, QueryRunner, Repository } from 'typeorm';
+import {
+  FindOptionsWhere,
+  LessThan,
+  MoreThan,
+  QueryRunner,
+  Repository,
+} from 'typeorm';
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
 import { PaginateItemDto } from './dto/paginate-item.dto';
@@ -19,12 +25,44 @@ export class ItemsService {
   ) {}
   // 오름차 순으로 정렬하는 페이지네이션만 구현
   async paginateItems(dto: PaginateItemDto) {
+    if (dto.page) {
+      return this.pagePaginateItems(dto);
+    } else {
+      return this.cursorPaginateItems(dto);
+    }
+  }
+
+  async pagePaginateItems(dto: PaginateItemDto) {
+    const [items, count] =
+      await this.itemRepository.findAndCount({
+        skip: dto.take * (dto.page - 1),
+        take: dto.take,
+        order: {
+          created_at: dto.order__createdAt,
+        },
+      });
+
+    return {
+      data: items,
+      total: count,
+    };
+  }
+
+  async cursorPaginateItems(dto: PaginateItemDto) {
+    const where: FindOptionsWhere<ItemModel> = {};
+
+    if (dto.where__itemNumber_less_than) {
+      where.item_number = LessThan(
+        dto.where__itemNumber_less_than,
+      );
+    } else if (dto.where__itemNumber_more_than) {
+      where.item_number = MoreThan(
+        dto.where__itemNumber_more_than,
+      );
+    }
+
     const items = await this.itemRepository.find({
-      where: {
-        item_number: MoreThan(
-          dto.where__itemNumber_more_than ?? 0,
-        ),
-      },
+      where,
       order: {
         created_at: dto.order__createdAt,
       },
@@ -32,7 +70,9 @@ export class ItemsService {
     });
 
     const lastItem =
-      items.length > 0 ? items[items.length - 1] : null;
+      items.length > 0 && items.length === dto.take
+        ? items[items.length - 1]
+        : null;
 
     const nextUrl =
       lastItem &&
@@ -43,14 +83,25 @@ export class ItemsService {
     if (nextUrl) {
       for (const key of Object.keys(dto)) {
         if (dto[key]) {
-          if (key !== 'where__itemNumber_more_than') {
+          if (
+            key !== 'where__itemNumber_more_than' &&
+            key !== 'where__itemNumber_less_than'
+          ) {
             nextUrl.searchParams.append(key, dto[key]);
           }
         }
       }
 
+      let key = null;
+
+      if (dto.order__createdAt === 'ASC') {
+        key = 'where__itemNumber_more_than';
+      } else {
+        key = 'where__itemNumber_less_than';
+      }
+
       nextUrl.searchParams.append(
-        'where__itemNumber_more_than',
+        key,
         lastItem.item_number.toString(),
       );
     }
@@ -58,10 +109,10 @@ export class ItemsService {
     return {
       data: items,
       cursor: {
-        after: lastItem?.item_number,
+        after: lastItem?.item_number ?? null,
       },
       count: items.length,
-      next: nextUrl?.toString(),
+      next: nextUrl?.toString() ?? null,
     };
   }
 
