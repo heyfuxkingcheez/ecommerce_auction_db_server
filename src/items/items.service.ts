@@ -4,16 +4,71 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ItemModel } from './entities/item.entity';
-import { QueryRunner, Repository } from 'typeorm';
+import { MoreThan, QueryRunner, Repository } from 'typeorm';
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
+import { PaginateItemDto } from './dto/paginate-item.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class ItemsService {
   constructor(
     @InjectRepository(ItemModel)
     private readonly itemRepository: Repository<ItemModel>,
+    private readonly configService: ConfigService,
   ) {}
+  // 오름차 순으로 정렬하는 페이지네이션만 구현
+  async paginateItems(dto: PaginateItemDto) {
+    const items = await this.itemRepository.find({
+      where: {
+        item_number: MoreThan(
+          dto.where__itemNumber_more_than ?? 0,
+        ),
+      },
+      order: {
+        created_at: dto.order__createdAt,
+      },
+      take: dto.take,
+    });
+
+    const lastItem =
+      items.length > 0 ? items[items.length - 1] : null;
+
+    const nextUrl =
+      lastItem &&
+      new URL(
+        `${this.configService.get<string>('URL')}/items`,
+      );
+
+    if (nextUrl) {
+      for (const key of Object.keys(dto)) {
+        if (dto[key]) {
+          if (key !== 'where__itemNumber_more_than') {
+            nextUrl.searchParams.append(key, dto[key]);
+          }
+        }
+      }
+
+      nextUrl.searchParams.append(
+        'where__itemNumber_more_than',
+        lastItem.item_number.toString(),
+      );
+    }
+
+    return {
+      data: items,
+      cursor: {
+        after: lastItem?.item_number,
+      },
+      count: items.length,
+      next: nextUrl?.toString(),
+    };
+  }
+
+  async generateItems() {
+    for (let i = 0; i < 100; i++) {}
+  }
+
   async getAllItems() {
     return await this.itemRepository.find();
   }

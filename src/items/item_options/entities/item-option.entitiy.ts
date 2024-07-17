@@ -1,8 +1,8 @@
 import { BaseModel } from 'src/common/entities';
 import { Column, Entity, ManyToOne } from 'typeorm';
-import { ItemModel } from './item.entity';
-import { ItemOptionEnum } from '../const/itemOpion.const';
 import { IsEnum } from 'class-validator';
+import { ItemOptionEnum } from 'src/items/const/itemOpion.const';
+import { ItemModel } from 'src/items/entities/item.entity';
 
 @Entity()
 export class ItemOptionModel extends BaseModel {

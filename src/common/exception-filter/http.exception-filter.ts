@@ -20,7 +20,7 @@ export class HttpExceptionFilter
     // 에러 모니터링 시스템에 API 콜 하기
 
     let errLog = {
-      userId: request.user.id,
+      userId: request.user ? request.user.id : 'PUBLIC',
       path: request.url,
       timestamp: new Date().toLocaleString('kr'),
       detail: exception.stack,

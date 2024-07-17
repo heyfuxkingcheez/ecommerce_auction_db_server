@@ -22,6 +22,7 @@ import { LogInterceptor } from './common/interceptor/log.interceptor';
 import { PaymentsModule } from './payments/payment.module';
 import { RolesGuard } from './users/guard/roles.guard';
 import { ItemsModule } from './items/items.module';
+import { ItemOptionsModule } from './items/item_options/item_options.module';
 
 @Module({
   imports: [
@@ -55,6 +56,7 @@ import { ItemsModule } from './items/items.module';
     AddressBooksModule,
     SettlementAccountsModule,
     ItemsModule,
+    ItemOptionsModule,
   ],
   controllers: [AppController],
   providers: [

@@ -6,7 +6,7 @@ import {
 import { BaseModel } from 'src/common/entities';
 import { ImageModel } from 'src/common/entities/image.entity';
 import { Column, Entity, OneToMany } from 'typeorm';
-import { ItemOptionModel } from './item-option.entitiy';
+import { ItemOptionModel } from '../item_options/entities/item-option.entitiy';
 
 @Entity()
 export class ItemModel extends BaseModel {

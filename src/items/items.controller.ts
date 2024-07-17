@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Req,
   UseInterceptors,
 } from '@nestjs/common';
@@ -20,16 +21,23 @@ import { TransactionInterceptor } from 'src/common/interceptor/transaction.inter
 import { QueryRunner } from 'src/common/decorator/query-runner.decorator';
 import { QueryRunner as QR } from 'typeorm';
 import { IsPublic } from 'src/common/decorator/is-public.decorator';
+import { PaginateItemDto } from './dto/paginate-item.dto';
 
 @Controller('items')
-@Roles(RolesEnum.ADMIN)
 export class ItemsController {
   constructor(
     private readonly itemsService: ItemsService,
     private readonly imagesService: ImagesService,
   ) {}
 
+  @Get()
+  @IsPublic()
+  async getItems(@Query() query: PaginateItemDto) {
+    return await this.itemsService.paginateItems(query);
+  }
+
   @Post()
+  @Roles(RolesEnum.ADMIN)
   @UseInterceptors(TransactionInterceptor)
   async postItem(
     @Body() dto: CreateItemDto,
@@ -53,6 +61,7 @@ export class ItemsController {
   }
 
   @Patch(':itemId')
+  @Roles(RolesEnum.ADMIN)
   @UseInterceptors(TransactionInterceptor)
   async patchItem(
     @Body() dto: UpdateItemDto,
@@ -81,16 +90,8 @@ export class ItemsController {
   }
 
   @Delete(':itemId')
+  @Roles(RolesEnum.ADMIN)
   async deleteItem(@Param('itemId') itemId: string) {
     return await this.itemsService.deleteItem(itemId);
   }
-
-  @Get()
-  @IsPublic()
-  async getItems() {
-    return await this.itemsService.getAllItems();
-  }
-
-  @Post('/option/:itemId')
-  async postItemOption() {}
 }
