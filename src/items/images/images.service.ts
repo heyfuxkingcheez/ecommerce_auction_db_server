@@ -13,6 +13,7 @@ import {
 } from 'src/common/const/path.const';
 import { basename, join } from 'path';
 import { promises } from 'fs';
+import { v7 as uuidv7 } from 'uuid';
 
 @Injectable()
 export class ImagesService {
@@ -48,7 +49,7 @@ export class ImagesService {
 
     const newPath = join(ITEM_IMAGE_PATH, fileName);
 
-    const existImages = await repo.findOne({
+    const existImages = await this.imageRepository.findOne({
       where: {
         order: dto.order,
         item: {
@@ -66,8 +67,13 @@ export class ImagesService {
         existImages,
       );
     } else {
-      await repo.save({ ...dto });
+      const newImage = repo.create({ ...dto });
+
+      await repo.save(newImage);
     }
-    return await promises.rename(tempFilePath, newPath);
+
+    await promises.rename(tempFilePath, newPath);
+
+    return true;
   }
 }

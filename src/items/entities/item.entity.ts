@@ -10,11 +10,6 @@ import { ItemOptionModel } from '../item_options/entities/item-option.entitiy';
 
 @Entity()
 export class ItemModel extends BaseModel {
-  @Column({
-    generated: 'increment',
-  })
-  item_number: number;
-
   @Column()
   @IsString()
   item_name_kr: string;

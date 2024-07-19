@@ -20,10 +20,6 @@ export class PaymentsModel extends BaseModel {
   })
   payment_key: string;
 
-  @Column({ nullable: false })
-  @IsNumber()
-  amount: number;
-
   @ManyToOne(() => UserModel, (user) => user.payments)
   user: UserModel;
 }

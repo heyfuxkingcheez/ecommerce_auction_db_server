@@ -51,14 +51,10 @@ export class ItemsService {
   async cursorPaginateItems(dto: PaginateItemDto) {
     const where: FindOptionsWhere<ItemModel> = {};
 
-    if (dto.where__itemNumber_less_than) {
-      where.item_number = LessThan(
-        dto.where__itemNumber_less_than,
-      );
-    } else if (dto.where__itemNumber_more_than) {
-      where.item_number = MoreThan(
-        dto.where__itemNumber_more_than,
-      );
+    if (dto.where__itemNumber__less_than) {
+      where.id = LessThan(dto.where__itemNumber__less_than);
+    } else if (dto.where__itemNumber__more_than) {
+      where.id = MoreThan(dto.where__itemNumber__more_than);
     }
 
     const items = await this.itemRepository.find({
@@ -100,16 +96,13 @@ export class ItemsService {
         key = 'where__itemNumber_less_than';
       }
 
-      nextUrl.searchParams.append(
-        key,
-        lastItem.item_number.toString(),
-      );
+      nextUrl.searchParams.append(key, lastItem.id);
     }
 
     return {
       data: items,
       cursor: {
-        after: lastItem?.item_number ?? null,
+        after: lastItem?.id ?? null,
       },
       count: items.length,
       next: nextUrl?.toString() ?? null,

@@ -33,6 +33,7 @@ export class TransactionInterceptor
         await qr.release();
         console.log('TS END!');
 
+        console.log(e);
         throw new InternalServerErrorException(e.message);
       }),
       tap(async () => {

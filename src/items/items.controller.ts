@@ -44,6 +44,7 @@ export class ItemsController {
     @QueryRunner() qr?: QR,
   ) {
     const item = await this.itemsService.postItem(dto, qr);
+    console.log(item);
 
     for (let i = 0; i < dto.images.length; i++) {
       await this.imagesService.createItemImage(
