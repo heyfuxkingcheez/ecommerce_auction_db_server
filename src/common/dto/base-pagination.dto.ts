@@ -2,6 +2,7 @@ import {
   IsIn,
   IsNumber,
   IsOptional,
+  IsUUID,
 } from 'class-validator';
 
 export class BasePaginationDto {
@@ -9,19 +10,19 @@ export class BasePaginationDto {
   @IsOptional()
   page?: number;
 
-  @IsNumber()
+  @IsUUID()
   @IsOptional()
-  where__itemNumber__more_than?: string;
+  where__id__more_than?: string;
 
-  @IsNumber()
+  @IsUUID()
   @IsOptional()
-  where__itemNumber__less_than?: string;
+  where__id__less_than?: string;
 
   @IsIn(['ASC', 'DESC'])
   @IsOptional()
-  order__createdAt: 'ASC' | 'DESC' = 'ASC';
+  order__created_at: 'ASC' | 'DESC' = 'ASC';
 
   @IsNumber()
   @IsOptional()
-  take: number = 2;
+  take: number = 20;
 }

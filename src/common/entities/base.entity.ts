@@ -9,7 +9,7 @@ import { v7 as uuidv7 } from 'uuid';
 
 @Entity()
 export abstract class BaseModel {
-  @PrimaryColumn()
+  @PrimaryColumn('uuid')
   id: string = uuidv7();
 
   @CreateDateColumn({
