@@ -18,7 +18,7 @@ export class PaymentsModel extends BaseModel {
   @IsString({
     message: stringValidationMessage,
   })
-  payment_key: string;
+  billing_key: string;
 
   @ManyToOne(() => UserModel, (user) => user.payments)
   user: UserModel;

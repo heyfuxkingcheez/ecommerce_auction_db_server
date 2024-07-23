@@ -1,10 +1,14 @@
-import { Controller, Get, Post, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Res,
+} from '@nestjs/common';
 import { PaymentsService } from './payment.service';
-import { Request, Response } from 'express';
-import { PUBLIC_FOLDER_PATH } from 'src/common/const/path.const';
-import { join } from 'path';
-import { IsPublic } from 'src/common/decorator/is-public.decorator';
 import { User } from 'src/users/decorator/user.decorator';
+import { CardInfoDto } from './dto/card-info.dto';
+import { STATUS_CODES } from 'http';
 
 @Controller('payments')
 export class PaymentsController {
@@ -12,16 +16,16 @@ export class PaymentsController {
     private readonly paymentInfosService: PaymentsService,
   ) {}
 
-  @Get('tosspayments')
-  @IsPublic()
-  requestPayment(@Res() res: Response) {
-    res.sendFile(join(PUBLIC_FOLDER_PATH, 'checkout.html'));
-  }
-
-  @Post('test')
-  async postPayment(@User('id') userId: string) {
-    return await this.paymentInfosService.postPayment(
+  @Post('billing-key')
+  async postBillingKey(
+    @User('id') userId: string,
+    @Body() dto: CardInfoDto,
+  ) {
+    await this.paymentInfosService.postBillingKey(
       userId,
+      dto,
     );
+
+    return { STATUS_CODES: 200, message: '카드 등록 완료' };
   }
 }

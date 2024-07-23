@@ -39,8 +39,6 @@ export class SettlementAccountsController {
     @User('id') userId: string,
     @Req() req: Request,
   ) {
-    console.log(req.user);
-
     return await this.settlementAccountsService.getSettlementAccount(
       userId,
     );

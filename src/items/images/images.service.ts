@@ -13,7 +13,6 @@ import {
 } from 'src/common/const/path.const';
 import { basename, join } from 'path';
 import { promises } from 'fs';
-import { v7 as uuidv7 } from 'uuid';
 
 @Injectable()
 export class ImagesService {

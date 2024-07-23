@@ -4,17 +4,10 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ItemModel } from './entities/item.entity';
-import {
-  FindOptionsWhere,
-  LessThan,
-  MoreThan,
-  QueryRunner,
-  Repository,
-} from 'typeorm';
+import { QueryRunner, Repository } from 'typeorm';
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
 import { PaginateItemDto } from './dto/paginate-item.dto';
-import { ConfigService } from '@nestjs/config';
 import { CommonService } from 'src/common/common.service';
 
 @Injectable()
@@ -22,14 +15,15 @@ export class ItemsService {
   constructor(
     @InjectRepository(ItemModel)
     private readonly itemRepository: Repository<ItemModel>,
-    private readonly configService: ConfigService,
     private readonly commonService: CommonService,
   ) {}
   async paginateItems(dto: PaginateItemDto) {
     return this.commonService.paginate(
       dto,
       this.itemRepository,
-      {},
+      {
+        relations: ['images'],
+      },
       'items',
     );
   }

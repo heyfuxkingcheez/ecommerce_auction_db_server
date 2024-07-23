@@ -150,7 +150,6 @@ export class CommonService {
     const options: FindOptionsWhere<T> = {};
 
     const split = key.split('__');
-    console.log(split);
 
     if (split.length !== 2 && split.length !== 3) {
       throw new BadRequestException(
@@ -164,7 +163,7 @@ export class CommonService {
       options[field] = value;
     } else {
       const [_, field, operator] = split;
-      console.log(operator);
+
       // const values = value.toString().split(',');
 
       // if (operator === 'between') {
