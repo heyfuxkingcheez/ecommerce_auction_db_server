@@ -10,3 +10,13 @@ services:
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_DATABASE}
+  redis:
+    image: redis:7.2.5
+    container_name: redis
+    restart: always
+    command: redis-server /usr/local/conf/redis.conf
+    volumes:
+      - ./redis-data:/data
+      - ./redis-data/conf/redis.conf:/usr/local/conf/redis.conf
+    ports:
+      - '6379:6379'

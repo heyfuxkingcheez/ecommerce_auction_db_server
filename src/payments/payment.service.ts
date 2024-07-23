@@ -5,10 +5,10 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaymentsModel } from './entities/payments.entity';
 import { Repository } from 'typeorm';
-import { v4 as uuidv4 } from 'uuid';
 import { ConfigService } from '@nestjs/config';
 import { CardInfoDto } from './dto/card-info.dto';
 import fetch from 'node-fetch';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class PaymentsService {
@@ -26,6 +26,8 @@ export class PaymentsService {
       this.configService.get<string>('API_SECRET');
     const channelKey =
       this.configService.get<string>('CHANNEL_KEY');
+    const hashRounds =
+      this.configService.get<string>('HASH_ROUNDS');
 
     const issueResponse = await fetch(
       'https://api.portone.io/billing-keys',
@@ -43,7 +45,12 @@ export class PaymentsService {
           method: {
             card: {
               credential: {
-                ...dto,
+                number: dto.number,
+                expiryYear: dto.expiryYear,
+                expiryMonth: dto.expiryMonth,
+                birthOrBusinessRegistrationNumber:
+                  dto.birthOrBusinessRegistrationNumber,
+                passwordTwoDigits: dto.passwordTwoDigits,
               },
             },
           },
@@ -60,13 +67,29 @@ export class PaymentsService {
       billingKeyInfo: { billingKey },
     } = await issueResponse.json();
 
+    const hash = bcrypt.hashSync(
+      dto.payment_password,
+      +hashRounds,
+    );
+
     const newPayment = this.paymentsRepository.create({
       user: {
         id: userId,
       },
       billing_key: billingKey,
+      payment_password: hash,
     });
 
     return await this.paymentsRepository.save(newPayment);
+  }
+
+  async getBillingkeyByUserId(userId: string) {
+    return await this.paymentsRepository.find({
+      where: {
+        user: {
+          id: userId,
+        },
+      },
+    });
   }
 }

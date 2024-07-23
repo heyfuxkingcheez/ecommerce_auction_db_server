@@ -1,16 +1,16 @@
-import { IsNumber, IsString } from 'class-validator';
-import { BaseModel } from 'src/common/entities';
-import { stringValidationMessage } from 'src/common/validation-message';
-import { UserModel } from 'src/users/entities';
-import internal from 'stream';
+import { Exclude } from 'class-transformer';
 import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  OneToMany,
-  OneToOne,
-} from 'typeorm';
+  IsNumber,
+  IsString,
+  Length,
+} from 'class-validator';
+import { BaseModel } from 'src/common/entities';
+import {
+  lengthValidationMessage,
+  stringValidationMessage,
+} from 'src/common/validation-message';
+import { UserModel } from 'src/users/entities';
+import { Column, Entity, ManyToOne } from 'typeorm';
 
 @Entity()
 export class PaymentsModel extends BaseModel {
@@ -19,6 +19,16 @@ export class PaymentsModel extends BaseModel {
     message: stringValidationMessage,
   })
   billing_key: string;
+
+  @Column()
+  @IsString()
+  @Length(4, 6, {
+    message: lengthValidationMessage,
+  })
+  @Exclude({
+    toPlainOnly: true,
+  })
+  payment_password: string;
 
   @ManyToOne(() => UserModel, (user) => user.payments)
   user: UserModel;

@@ -1,4 +1,4 @@
-import { IsString } from 'class-validator';
+import { IsNumber, IsString } from 'class-validator';
 
 export class CardInfoDto {
   @IsString()
@@ -15,4 +15,7 @@ export class CardInfoDto {
 
   @IsString()
   passwordTwoDigits: string;
+
+  @IsString()
+  payment_password: string;
 }

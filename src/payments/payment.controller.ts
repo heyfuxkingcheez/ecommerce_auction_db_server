@@ -15,6 +15,12 @@ export class PaymentsController {
   constructor(
     private readonly paymentInfosService: PaymentsService,
   ) {}
+  @Get()
+  async getBillingKey(@User('id') userId: string) {
+    return await this.paymentInfosService.getBillingkeyByUserId(
+      userId,
+    );
+  }
 
   @Post('billing-key')
   async postBillingKey(

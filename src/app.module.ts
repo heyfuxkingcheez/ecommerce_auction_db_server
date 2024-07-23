@@ -23,9 +23,20 @@ import { PaymentsModule } from './payments/payment.module';
 import { RolesGuard } from './users/guard/roles.guard';
 import { ItemsModule } from './items/items.module';
 import { ItemOptionsModule } from './items/item_options/item_options.module';
+import { BullModule } from '@nestjs/bull';
 
 @Module({
   imports: [
+    BullModule.forRoot({
+      redis: {
+        host: 'localhost',
+        port: 6379,
+        password: 'wook',
+      },
+    }),
+    BullModule.registerQueue({
+      name: 'testQueue',
+    }),
     ServeStaticModule.forRoot({
       rootPath: PUBLIC_FOLDER_PATH,
       serveRoot: '/public',
