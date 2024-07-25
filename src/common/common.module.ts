@@ -13,9 +13,13 @@ import { TEMP_FOLDER_PATH } from 'src/common/const/path.const';
 import { v4 as uuid } from 'uuid';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ImageModel } from './entities/image.entity';
+import { BullModule } from '@nestjs/bull';
 
 @Module({
   imports: [
+    BullModule.registerQueue({
+      name: 'wook',
+    }),
     TypeOrmModule.forFeature([ImageModel]),
     MulterModule.register({
       limits: {

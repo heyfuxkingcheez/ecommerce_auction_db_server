@@ -24,26 +24,17 @@ import { RolesGuard } from './users/guard/roles.guard';
 import { ItemsModule } from './items/items.module';
 import { ItemOptionsModule } from './items/item_options/item_options.module';
 import { BullModule } from '@nestjs/bull';
+import { AppConsumer } from './app.consumer';
 
 @Module({
   imports: [
-    BullModule.forRoot({
-      redis: {
-        host: 'localhost',
-        port: 6379,
-        password: 'wook',
-      },
-    }),
-    BullModule.registerQueue({
-      name: 'testQueue',
+    ConfigModule.forRoot({
+      envFilePath: `.env`,
+      isGlobal: true,
     }),
     ServeStaticModule.forRoot({
       rootPath: PUBLIC_FOLDER_PATH,
       serveRoot: '/public',
-    }),
-    ConfigModule.forRoot({
-      envFilePath: `.env`,
-      isGlobal: true,
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -60,6 +51,18 @@ import { BullModule } from '@nestjs/bull';
           configService.get<string>('RUNTIME') !== 'prod',
       }),
     }),
+    BullModule.forRoot({
+      redis: {
+        host: 'localhost',
+        port: 6379,
+      },
+    }),
+    BullModule.forRoot('alternate-config', {
+      redis: {
+        host: '172.21.0.3',
+        port: 6379,
+      },
+    }),
     AuthModule,
     UsersModule,
     CommonModule,
@@ -71,6 +74,7 @@ import { BullModule } from '@nestjs/bull';
   ],
   controllers: [AppController],
   providers: [
+    AppConsumer,
     AppService,
     {
       provide: APP_INTERCEPTOR,

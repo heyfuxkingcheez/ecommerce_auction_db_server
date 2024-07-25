@@ -12,12 +12,20 @@ import {
 import { BaseModel } from './entities';
 import { FILTER_MAPPER } from './const/filter-mapper.const';
 import { ConfigService } from '@nestjs/config';
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
 
 @Injectable()
 export class CommonService {
   constructor(
     private readonly configService: ConfigService,
-  ) {}
+    @InjectQueue('wook')
+    private readonly wook: Queue,
+  ) {
+    this.wook.on('error', (error) => {
+      console.error('Queue error:', error);
+    });
+  }
   paginate<T extends BaseModel>(
     dto: BasePaginationDto,
     repository: Repository<T>,
@@ -184,5 +192,19 @@ export class CommonService {
       }
     }
     return options;
+  }
+
+  async queueTest(data: number) {
+    for (let i = 0; i < 10; i++) {
+      await this.wook.add(
+        'wook',
+        {
+          dataId: i,
+        },
+        { delay: 3000, lifo: true },
+      );
+    }
+
+    return {};
   }
 }
