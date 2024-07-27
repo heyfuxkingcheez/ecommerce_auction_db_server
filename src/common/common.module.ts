@@ -18,7 +18,10 @@ import { BullModule } from '@nestjs/bull';
 @Module({
   imports: [
     BullModule.registerQueue({
-      name: 'wook',
+      name: 'buyBids',
+    }),
+    BullModule.registerQueue({
+      name: 'sellBids',
     }),
     TypeOrmModule.forFeature([ImageModel]),
     MulterModule.register({

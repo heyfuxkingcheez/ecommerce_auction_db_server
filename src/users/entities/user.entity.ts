@@ -4,6 +4,7 @@ import {
   Column,
   Entity,
   JoinColumn,
+  ManyToOne,
   OneToMany,
   OneToOne,
 } from 'typeorm';
@@ -27,6 +28,8 @@ import { join } from 'path';
 import { USER_PUBLIC_PROFILE_IMAGE_PATH } from 'src/common/const/path.const';
 import { DEFAULT_PROFILE_IAMGE } from 'src/common/const/default_value.const';
 import { PaymentsModel } from '../../payments/entities/payments.entity';
+import { PurchaseBiddingModel } from 'src/auctions/entities/purchase-bidding.entity';
+import { SaleBiddingModel } from 'src/auctions/entities/sale-bidding.entity';
 
 @Entity()
 export class UserModel extends BaseModel {
@@ -104,4 +107,16 @@ export class UserModel extends BaseModel {
     (settlementAccount) => settlementAccount.user,
   )
   settlement_account: SettlementAccountModel;
+
+  @OneToMany(
+    () => PurchaseBiddingModel,
+    (purchaseBidding) => purchaseBidding.user,
+  )
+  purchaseBidding: PurchaseBiddingModel[];
+
+  @OneToMany(
+    () => SaleBiddingModel,
+    (salebidding) => salebidding.user,
+  )
+  saleBidding: SaleBiddingModel[];
 }

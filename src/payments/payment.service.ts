@@ -1,6 +1,7 @@
 import {
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaymentsModel } from './entities/payments.entity';
@@ -91,5 +92,21 @@ export class PaymentsService {
         },
       },
     });
+  }
+
+  async getBillingKeyById(billngKey: string) {
+    const existbillngKey =
+      await this.paymentsRepository.find({
+        where: {
+          id: billngKey,
+        },
+      });
+
+    if (!existbillngKey)
+      throw new NotFoundException(
+        '존재하지 않는 결제 정보 입니다.',
+      );
+
+    return existbillngKey;
   }
 }

@@ -22,10 +22,4 @@ export class CommonController {
       fileName: file.filename,
     };
   }
-
-  @Post('wook')
-  @IsPublic()
-  async queueTest(@Body('data') data: number) {
-    return await this.commonService.queueTest(data);
-  }
 }

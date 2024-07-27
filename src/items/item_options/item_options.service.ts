@@ -72,7 +72,7 @@ export class ItemOptionsService {
     });
   }
 
-  private async getItemOpionByItemOptionId(
+  async getItemOpionByItemOptionId(
     itemOptionId: string,
   ): Promise<ItemOptionModel> {
     const itemOption =
@@ -84,7 +84,7 @@ export class ItemOptionsService {
 
     if (!itemOption)
       throw new NotFoundException(
-        '존재하지 않는 옵셥 입니다.',
+        '존재하지 않는 옵션 입니다.',
       );
 
     return itemOption;

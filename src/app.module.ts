@@ -25,6 +25,7 @@ import { ItemsModule } from './items/items.module';
 import { ItemOptionsModule } from './items/item_options/item_options.module';
 import { BullModule } from '@nestjs/bull';
 import { AppConsumer } from './app.consumer';
+import { AuctionsModule } from './auctions/auctions.module';
 
 @Module({
   imports: [
@@ -57,12 +58,6 @@ import { AppConsumer } from './app.consumer';
         port: 6379,
       },
     }),
-    BullModule.forRoot('alternate-config', {
-      redis: {
-        host: '172.21.0.3',
-        port: 6379,
-      },
-    }),
     AuthModule,
     UsersModule,
     CommonModule,
@@ -71,6 +66,7 @@ import { AppConsumer } from './app.consumer';
     SettlementAccountsModule,
     ItemsModule,
     ItemOptionsModule,
+    AuctionsModule,
   ],
   controllers: [AppController],
   providers: [
