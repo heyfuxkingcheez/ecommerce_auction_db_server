@@ -14,4 +14,7 @@ export class PurchaseBiddingDto extends PickType(
 
   @IsString()
   addressId: string;
+
+  @IsString()
+  payment_password: string;
 }

@@ -2,6 +2,7 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaymentsModel } from './entities/payments.entity';
@@ -10,6 +11,7 @@ import { ConfigService } from '@nestjs/config';
 import { CardInfoDto } from './dto/card-info.dto';
 import fetch from 'node-fetch';
 import * as bcrypt from 'bcrypt';
+import { v7 as uuidv7 } from 'uuid';
 
 @Injectable()
 export class PaymentsService {
@@ -94,9 +96,12 @@ export class PaymentsService {
     });
   }
 
-  async getBillingKeyById(billngKey: string) {
+  async getBillingKeyById(
+    billngKey: string,
+    password: string,
+  ) {
     const existbillngKey =
-      await this.paymentsRepository.find({
+      await this.paymentsRepository.findOne({
         where: {
           id: billngKey,
         },
@@ -107,6 +112,57 @@ export class PaymentsService {
         '존재하지 않는 결제 정보 입니다.',
       );
 
+    const comparePassword = bcrypt.compareSync(
+      password,
+      existbillngKey.payment_password,
+    );
+
+    if (!comparePassword)
+      throw new UnauthorizedException(
+        '결제 비밀번호가 일치하지 않습니다.',
+      );
+
     return existbillngKey;
+  }
+
+  async requestPaymentWithBillingKey(
+    billingKey: string,
+    userId: string,
+    price: number,
+  ) {
+    const apiSecret =
+      this.configService.get<string>('API_SECRET');
+    try {
+      const paymentResponse = await fetch(
+        `https://api.portone.io/payments/${encodeURIComponent(uuidv7())}/billing-key`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `PortOne ${apiSecret}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            billingKey,
+            orderName: '구매 입찰 결제',
+            // 빌링키 결제 API를 참고해 고객 정보를 채워주세요.
+            customer: {
+              id: userId,
+            },
+            amount: {
+              total: price,
+            },
+            currency: 'KRW',
+          }),
+        },
+      );
+      if (!paymentResponse.ok)
+        throw new Error(
+          `paymentResponse: ${await paymentResponse.json()}`,
+        );
+
+      console.log(await paymentResponse.json());
+    } catch (error) {
+      console.log(error);
+    }
   }
 }

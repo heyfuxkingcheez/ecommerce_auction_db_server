@@ -9,9 +9,17 @@ import { AddressBooksModule } from 'src/users/address-books/address-books.module
 import { CommonModule } from 'src/common/common.module';
 import { SaleBiddingModel } from './entities/sale-bidding.entity';
 import { BidExecutionModel } from './entities/bid-execution.entity';
+import { AuctionsConsumer } from './auction.consumer';
+import { BullModule } from '@nestjs/bull';
 
 @Module({
   imports: [
+    BullModule.registerQueue(
+      {
+        name: 'auction',
+      },
+      { name: 'payment' },
+    ),
     TypeOrmModule.forFeature([
       PurchaseBiddingModel,
       SaleBiddingModel,
@@ -21,8 +29,10 @@ import { BidExecutionModel } from './entities/bid-execution.entity';
     PaymentsModule,
     AddressBooksModule,
     CommonModule,
+    PaymentsModule,
   ],
   controllers: [AuctionsController],
-  providers: [AuctionsService],
+  providers: [AuctionsService, AuctionsConsumer],
+  exports: [AuctionsService],
 })
 export class AuctionsModule {}

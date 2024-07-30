@@ -14,12 +14,14 @@ export class BidExecutionModel extends BaseModel {
   @ManyToOne(
     () => PurchaseBiddingModel,
     (purchaseBidding) => purchaseBidding.bidExecution,
+    { nullable: false },
   )
   purchaseBidding: PurchaseBiddingModel;
 
   @ManyToOne(
     () => SaleBiddingModel,
     (saleBidding) => saleBidding.bidExecution,
+    { nullable: false },
   )
   saleBidding: SaleBiddingModel;
 }

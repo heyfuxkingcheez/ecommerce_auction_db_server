@@ -19,15 +19,7 @@ import { Queue } from 'bull';
 export class CommonService {
   constructor(
     private readonly configService: ConfigService,
-    @InjectQueue('buyBids')
-    private readonly buyBids: Queue,
-    @InjectQueue('sellBids')
-    private readonly sellBids: Queue,
-  ) {
-    this.buyBids.on('error', (error) => {
-      console.error('Queue error:', error);
-    });
-  }
+  ) {}
   paginate<T extends BaseModel>(
     dto: BasePaginationDto,
     repository: Repository<T>,
@@ -194,66 +186,5 @@ export class CommonService {
       }
     }
     return options;
-  }
-
-  async purchaseBidsQueue(
-    purchaseBiddingId: string,
-    userId: string,
-    itemOptionId: string,
-    price: number,
-  ) {
-    await this.buyBids.add(
-      'buyBid',
-      {
-        buyId: purchaseBiddingId,
-        userId,
-        itemOptionId,
-        price,
-      },
-      { removeOnComplete: true },
-    );
-
-    this.matchBids();
-  }
-
-  async saleBidQueue(
-    saleBiddingId: string,
-    userId: string,
-    itemOptionId: string,
-    price: number,
-  ) {
-    await this.sellBids.add(
-      'sellBid',
-      {
-        sellId: saleBiddingId,
-        userId,
-        itemOptionId,
-        price,
-      },
-      { removeOnComplete: true },
-    );
-
-    this.matchBids();
-  }
-
-  private async matchBids() {
-    const buyBids = await this.buyBids.getJobs(['waiting']);
-    const sellBids = await this.sellBids.getJobs([
-      'waiting',
-    ]);
-
-    for (let buyBid of buyBids) {
-      for (let sellBid of sellBids) {
-        if (
-          buyBid.data.price === sellBid.data.price &&
-          buyBid.data.itemOptionId ===
-            sellBid.data.itemOptionId
-        ) {
-          console.log(
-            `매칭 성공! buy : ${buyBid.data.buyId} sell : ${sellBid.data.sellId}`,
-          );
-        }
-      }
-    }
   }
 }
