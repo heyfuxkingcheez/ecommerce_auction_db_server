@@ -11,6 +11,7 @@ import { SaleBiddingDto } from './dto/sale-bidding.dto';
 import { QueryRunner as QR } from 'typeorm';
 import { QueryRunner } from 'src/common/decorator/query-runner.decorator';
 import { TransactionInterceptor } from 'src/common/interceptor/transaction.interceptor';
+
 @Controller('auctions')
 export class AuctionsController {
   constructor(

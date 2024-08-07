@@ -26,6 +26,7 @@ import { ItemOptionsModule } from './items/item_options/item_options.module';
 import { BullModule } from '@nestjs/bull';
 import { AppConsumer } from './app.consumer';
 import { AuctionsModule } from './auctions/auctions.module';
+import { RedlockModule } from './redlock/redlock.module';
 
 @Module({
   imports: [
@@ -50,13 +51,19 @@ import { AuctionsModule } from './auctions/auctions.module';
         autoLoadEntities: true,
         synchronize:
           configService.get<string>('RUNTIME') !== 'prod',
+        // logging: true,
       }),
     }),
-    BullModule.forRoot({
-      redis: {
-        host: 'localhost',
-        port: 6379,
-      },
+    BullModule.forRootAsync({
+      useFactory: async (configService: ConfigService) => ({
+        redis: {
+          host: 'localhost',
+          port: configService.get<number>(
+            'REDIS_BULL_PORT',
+          ),
+        },
+      }),
+      inject: [ConfigService],
     }),
     AuthModule,
     UsersModule,
@@ -67,6 +74,7 @@ import { AuctionsModule } from './auctions/auctions.module';
     ItemsModule,
     ItemOptionsModule,
     AuctionsModule,
+    RedlockModule,
   ],
   controllers: [AppController],
   providers: [

@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -12,6 +13,8 @@ import { CardInfoDto } from './dto/card-info.dto';
 import fetch from 'node-fetch';
 import * as bcrypt from 'bcrypt';
 import { v7 as uuidv7 } from 'uuid';
+import { stringValidationMessage } from './../common/validation-message/string-validation.message';
+import { StringSchema } from 'joi';
 
 @Injectable()
 export class PaymentsService {
@@ -163,6 +166,51 @@ export class PaymentsService {
       console.log(await paymentResponse.json());
     } catch (error) {
       console.log(error);
+    }
+  }
+
+  async DeletePaymentWithBillingKey(
+    billingKey: string,
+    userId: string,
+  ) {
+    const apiSecret =
+      this.configService.get<string>('API_SECRET');
+    const url = `https://api.portone.io/billing-keys/${billingKey}`;
+    const options = {
+      method: 'delete',
+      headers: {
+        Authorization: `PortOne ${apiSecret}`,
+        'Content-Type': 'application/json',
+      },
+      body: '{}',
+    };
+    try {
+      const existBillingKey =
+        await this.paymentsRepository.findOne({
+          where: {
+            user: {
+              id: userId,
+            },
+            billing_key: billingKey,
+          },
+        });
+
+      if (!existBillingKey)
+        throw new BadRequestException(
+          '등록되지 않은 결제 정보 입니다.',
+        );
+
+      const response = await fetch(url, options);
+      const data = await response.json();
+      if (!data.deletedAt)
+        throw new BadRequestException('삭제 실패!');
+
+      return await this.paymentsRepository.delete(
+        existBillingKey.id,
+      );
+    } catch (error) {
+      // console.error(error);
+      throw error;
     }
   }
 }

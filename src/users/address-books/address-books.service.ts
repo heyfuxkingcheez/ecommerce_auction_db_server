@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -48,7 +49,7 @@ export class AddressBooksService {
       });
 
     if (!address)
-      throw new NotFoundException(
+      throw new BadRequestException(
         '존재하지 않는 주소입니다.',
       );
 

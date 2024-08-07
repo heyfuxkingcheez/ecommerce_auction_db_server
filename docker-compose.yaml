@@ -10,13 +10,69 @@ services:
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_DATABASE}
-  redis:
+  redis_bull:
     image: redis:7
     restart: always
+    container_name: redis_bull
     ports:
-      - '6379:6379'
+      - '${REDIS_BULL_PORT}:6379'
     volumes:
-      - ./redis_data:/data
+      - ./redis_data/bull:/data
+    env_file:
+      - .env
+    entrypoint: ['redis-server', '--appendonly', 'yes']
+  redis_lock1:
+    image: redis:7
+    restart: always
+    container_name: redis_lock1
+    ports:
+      - '${REDIS_LOCK1_PORT}:6379'
+    volumes:
+      - ./redis_data/lock:/data
+    env_file:
+      - .env
+    entrypoint: ['redis-server', '--appendonly', 'yes']
+  redis_lock2:
+    image: redis:7
+    restart: always
+    container_name: redis_lock2
+    ports:
+      - '${REDIS_LOCK2_PORT}:6379'
+    volumes:
+      - ./redis_data/lock:/data
+    env_file:
+      - .env
+    entrypoint: ['redis-server', '--appendonly', 'yes']
+  redis_lock3:
+    image: redis:7
+    restart: always
+    container_name: redis_lock3
+    ports:
+      - '${REDIS_LOCK3_PORT}:6379'
+    volumes:
+      - ./redis_data/lock:/data
+    env_file:
+      - .env
+    entrypoint: ['redis-server', '--appendonly', 'yes']
+  redis_lock4:
+    image: redis:7
+    restart: always
+    container_name: redis_lock4
+    ports:
+      - '${REDIS_LOCK4_PORT}:6379'
+    volumes:
+      - ./redis_data/lock:/data
+    env_file:
+      - .env
+    entrypoint: ['redis-server', '--appendonly', 'yes']
+  redis_lock5:
+    image: redis:7
+    restart: always
+    container_name: redis_lock5
+    ports:
+      - '${REDIS_LOCK5_PORT}:6379'
+    volumes:
+      - ./redis_data/lock:/data
     env_file:
       - .env
     entrypoint: ['redis-server', '--appendonly', 'yes']

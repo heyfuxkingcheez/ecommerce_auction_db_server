@@ -1,15 +1,20 @@
 import {
-  BadRequestException,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PurchaseBiddingModel } from './entities/purchase-bidding.entity';
-import { MoreThan, QueryRunner, Repository } from 'typeorm';
+import {
+  MoreThan,
+  QueryRunner,
+  Repository,
+  LessThanOrEqual,
+  MoreThanOrEqual,
+} from 'typeorm';
 import { ItemOptionsService } from 'src/items/item_options/item_options.service';
 import { PaymentsService } from './../payments/payment.service';
 import { AddressBooksService } from 'src/users/address-books/address-books.service';
-import { CommonService } from 'src/common/common.service';
 import { PurchaseBiddingDto } from './dto/purchase-bidding.dto';
 import { SaleBiddingDto } from './dto/sale-bidding.dto';
 import { SaleBiddingModel } from './entities/sale-bidding.entity';
@@ -17,6 +22,7 @@ import { BiddingStatusEnum } from './const/bidding-status.const';
 import { BidExecutionModel } from './entities/bid-execution.entity';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
+import Redlock, { Lock } from 'redlock';
 
 @Injectable()
 export class AuctionsService {
@@ -29,12 +35,15 @@ export class AuctionsService {
     @InjectRepository(BidExecutionModel)
     private readonly bidExecutionRepository: Repository<BidExecutionModel>,
     @InjectQueue('auction')
-    private readonly matchingBid: Queue,
+    private readonly auctionQueue: Queue,
+    @InjectQueue('payment')
+    private readonly reqBillingKey: Queue,
     private readonly itemOptionService: ItemOptionsService,
     private readonly paymentsService: PaymentsService,
     private readonly addressBooksService: AddressBooksService,
+    @Inject('Redlock') private readonly redlock: Redlock,
   ) {
-    this.matchingBid.on('error', (error) => {
+    this.auctionQueue.on('error', (error) => {
       console.error('Queue error:', error);
     });
   }
@@ -100,7 +109,7 @@ export class AuctionsService {
         userId,
       );
 
-      const newPurchaseBid = repo.create({
+      const purchaseBid = repo.create({
         user: {
           id: userId,
         },
@@ -118,18 +127,15 @@ export class AuctionsService {
         delivery_instruction: dto.delivery_instruction,
       });
 
-      await repo.save(newPurchaseBid);
-      await this.isMatchingBids(
+      await repo.save(purchaseBid);
+
+      await this.findMatchingBids(
         dto.itemOptionId,
         dto.price,
-        newPurchaseBid.id,
-        null,
         qr,
       );
-
-      return;
     } catch (error) {
-      console.error(error);
+      throw error;
     }
   }
 
@@ -144,7 +150,7 @@ export class AuctionsService {
         dto.itemOptionId,
       );
 
-      const newSaleBid = repo.create({
+      const saleBid = repo.create({
         user: {
           id: userId,
         },
@@ -155,119 +161,201 @@ export class AuctionsService {
         price: dto.price,
       });
 
-      await repo.save(newSaleBid);
-      await this.isMatchingBids(
+      await repo.save(saleBid);
+
+      await this.findMatchingBids(
         dto.itemOptionId,
         dto.price,
-        null,
-        newSaleBid.id,
         qr,
       );
-      return;
     } catch (error) {
-      console.error(error);
+      throw error;
     }
   }
 
-  private async isMatchingBids(
+  // private async isMatchingBids(
+  //   itemOptionId: string,
+  //   price: number,
+  //   purchaseBiddingId?: string,
+  //   saleBiddingId?: string,
+  //   qr?: QueryRunner,
+  // ) {
+  //   try {
+  //     // return purchaseBiddingId
+  //     //   ? await this.findMatchingPurchaseBid(
+  //     //       itemOptionId,
+  //     //       price,
+  //     //       purchaseBiddingId,
+  //     //       qr,
+  //     //     )
+  //     //   : await this.findMatchingSaleBid(
+  //     //       itemOptionId,
+  //     //       price,
+  //     //       saleBiddingId,
+  //     //       qr,
+  //     //     );
+  //     return this.findMatchingBids(itemOptionId, price, qr);
+  //   } catch (error) {
+  //     console.error(error);
+  //     throw new error();
+  //   }
+  // }
+
+  async findMatchingBids(
     itemOptionId: string,
     price: number,
-    purchaseBiddingId?: string,
-    saleBiddingId?: string,
     qr?: QueryRunner,
   ) {
-    return purchaseBiddingId
-      ? await this.findMatchingPurchaseBid(
+    const lock = await this.redlock.acquire(
+      [`${itemOptionId}`],
+      2000,
+    );
+    try {
+      const saleBid =
+        await this.findBidByItemOptionAndPrice(
           itemOptionId,
           price,
-          purchaseBiddingId,
+          false,
           qr,
-        )
-      : await this.findMatchingSaleBid(
+        );
+
+      const purchaseBid =
+        await this.findBidByItemOptionAndPrice(
           itemOptionId,
           price,
-          saleBiddingId,
+          true,
           qr,
         );
-  }
 
-  async findMatchingPurchaseBid(
-    itemOptionId: string,
-    price: number,
-    purchaseBiddingId: string,
-    qr?: QueryRunner,
-  ) {
-    const saleRepo = this.getSaleBiddingRepository(qr);
-    try {
-      const saleBid = await saleRepo.findOne({
-        where: {
-          itemOption: {
-            id: itemOptionId,
-          },
-          price,
-          expired_date: MoreThan(new Date()),
-          status: BiddingStatusEnum.ONGOING,
-        },
-        order: { id: 'ASC' },
-      });
+      if (saleBid && purchaseBid) {
+        await this.updateSaleBidStatus(saleBid.id, qr);
 
-      if (saleBid) {
-        // console.log(`매치된 판매자 : ${saleBid.id}`);
-        return this.matchingBidsQueue(
-          purchaseBiddingId,
-          saleBid.id,
-        );
-      }
-      return;
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
-  async findMatchingSaleBid(
-    itemOptionId: string,
-    price: number,
-    saleBiddingId: string,
-    qr?: QueryRunner,
-  ) {
-    const purchaseRepo =
-      this.getPurchaseBiddingRepository(qr);
-
-    try {
-      const purchaseBid = await purchaseRepo.findOne({
-        where: {
-          itemOption: {
-            id: itemOptionId,
-          },
-          price,
-          expired_date: MoreThan(new Date()),
-          status: BiddingStatusEnum.ONGOING,
-        },
-        order: { id: 'ASC' },
-      });
-
-      if (purchaseBid) {
-        return this.matchingBidsQueue(
+        await this.updatePurchaseBidStatus(
           purchaseBid.id,
-          saleBiddingId,
+          qr,
+        );
+
+        await this.matchingBids(
+          purchaseBid.id,
+          saleBid.id,
+          lock,
+          qr,
         );
       }
+
       return;
     } catch (error) {
       console.error(error);
+      throw error;
     }
   }
 
-  async matchingBidsQueue(
+  // async findMatchingPurchaseBid(
+  //   itemOptionId: string,
+  //   price: number,
+  //   purchaseBiddingId: string,
+  //   qr?: QueryRunner,
+  // ) {
+  //   try {
+  //     const saleBid =
+  //       await this.findBidByItemOptionAndPrice(
+  //         itemOptionId,
+  //         price,
+  //         false,
+  //         qr,
+  //       );
+
+  //     if (saleBid) {
+  //       console.log(saleBid);
+  //       await this.updateSaleBidStatus(saleBid.id, qr);
+
+  //       await this.updatePurchaseBidStatus(
+  //         purchaseBiddingId,
+  //         qr,
+  //       );
+
+  //       // await this.matchingBids(
+  //       //   purchaseBiddingId,
+  //       //   saleBid.id,
+  //       //   qr,
+  //       // );
+  //     }
+
+  //     return;
+  //   } catch (error) {
+  //     console.error(error);
+  //     throw error;
+  //   }
+  // }
+
+  // async findMatchingSaleBid(
+  //   itemOptionId: string,
+  //   price: number,
+  //   saleBiddingId: string,
+  //   qr?: QueryRunner,
+  // ) {
+  //   try {
+  //     const purchaseBid =
+  //       await this.findBidByItemOptionAndPrice(
+  //         itemOptionId,
+  //         price,
+  //         true,
+  //         qr,
+  //       );
+
+  //     if (purchaseBid) {
+  //       console.log(purchaseBid);
+  //       await this.updatePurchaseBidStatus(
+  //         purchaseBid.id,
+  //         qr,
+  //       );
+
+  //       await this.updateSaleBidStatus(saleBiddingId, qr);
+
+  //       // await this.matchingBids(
+  //       //   purchaseBid.id,
+  //       //   saleBiddingId,
+  //       //   lock
+  //       //   qr,
+  //       // );
+  //     }
+
+  //     return;
+  //   } catch (error) {
+  //     console.error(error);
+  //     throw error;
+  //   }
+  // }
+
+  async matchingBids(
     purchaseBiddingId: string,
     saleBiddingId: string,
+    lock: Lock,
+    qr?: QueryRunner,
   ) {
     try {
-      return await this.matchingBid.add(
-        'matchingBid',
+      console.log(
+        '구매',
+        purchaseBiddingId,
+        '판매',
+        saleBiddingId,
+      );
+      await this.postTransaction(
+        purchaseBiddingId,
+        saleBiddingId,
+        qr,
+      );
+
+      const billingKey = await this.getPurchaseBiddingById(
+        purchaseBiddingId,
+      );
+
+      await this.reqBillingKey.add(
+        'reqBillingKey',
         {
-          purchaseBiddingId,
-          saleBiddingId,
+          billingKey: billingKey.payment.billing_key,
+          userId: billingKey.user.id,
+          price: billingKey.price,
         },
         {
           removeOnComplete: true,
@@ -275,57 +363,96 @@ export class AuctionsService {
         },
       );
     } catch (error) {
-      console.log(error);
+      console.error(error);
+      throw new Error('Error adding to the queue');
+    } finally {
+      if (lock) await lock.release();
     }
   }
 
   async postTransaction(
     purchaseBiddingId: string,
     saleBiddingId: string,
+    qr?: QueryRunner,
   ) {
+    const bidExecutionRepo =
+      this.getBidExecutionRepository(qr);
     try {
-      const newBidExecution =
-        this.bidExecutionRepository.create({
-          status: BiddingStatusEnum.ONGOING,
-          saleBidding: {
-            id: saleBiddingId,
-          },
-          purchaseBidding: {
-            id: purchaseBiddingId,
-          },
-        });
+      const newBidExecution = bidExecutionRepo.create({
+        status: BiddingStatusEnum.ONGOING,
+        saleBidding: {
+          id: saleBiddingId,
+        },
+        purchaseBidding: {
+          id: purchaseBiddingId,
+        },
+      });
 
-      return await this.bidExecutionRepository.save(
-        newBidExecution,
-      );
+      return await bidExecutionRepo.save(newBidExecution);
     } catch (error) {
-      console.log(error);
+      throw error;
     }
   }
 
-  async updatePurchaseBidStatus(purchaseBiddingId: string) {
+  async updatePurchaseBidStatus(
+    purchaseBiddingId: string,
+    qr?: QueryRunner,
+  ) {
+    const purchaseRepo =
+      this.getPurchaseBiddingRepository(qr);
     try {
-      return await this.purchaseBiddingRepository.update(
-        purchaseBiddingId,
-        {
-          status: BiddingStatusEnum.COMPLETED,
-        },
-      );
+      return await purchaseRepo.update(purchaseBiddingId, {
+        status: BiddingStatusEnum.COMPLETED,
+      });
     } catch (error) {
-      console.log(error);
+      throw error;
     }
   }
 
-  async updateSaleBidStatus(saleBiddingId: string) {
+  async updateSaleBidStatus(
+    saleBiddingId: string,
+    qr?: QueryRunner,
+  ) {
+    const saleRepo = this.getSaleBiddingRepository(qr);
     try {
-      return await this.saleBiddingRepository.update(
-        saleBiddingId,
-        {
-          status: BiddingStatusEnum.COMPLETED,
-        },
-      );
+      return await saleRepo.update(saleBiddingId, {
+        status: BiddingStatusEnum.COMPLETED,
+      });
     } catch (error) {
-      console.log(error);
+      throw error;
     }
+  }
+
+  async findBidByItemOptionAndPrice(
+    itemOptionId: string,
+    price: number,
+    isPurchase: true | false,
+    qr?: QueryRunner,
+  ) {
+    let BidRepo:
+      | Repository<PurchaseBiddingModel>
+      | Repository<SaleBiddingModel>;
+    isPurchase
+      ? (BidRepo = this.getPurchaseBiddingRepository(qr))
+      : (BidRepo = this.getSaleBiddingRepository(qr));
+
+    const bid = await BidRepo.findOne({
+      where: {
+        itemOption: {
+          id: itemOptionId,
+        },
+        price: isPurchase
+          ? LessThanOrEqual(price)
+          : MoreThanOrEqual(price),
+        expired_date: MoreThan(new Date()),
+        status: BiddingStatusEnum.ONGOING,
+      },
+      order: {
+        id: 'ASC',
+        price: isPurchase ? 'DESC' : 'ASC',
+      },
+    });
+
+    return bid;
   }
 }

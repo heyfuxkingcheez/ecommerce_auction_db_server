@@ -9,7 +9,7 @@ import { AddressBooksModule } from 'src/users/address-books/address-books.module
 import { CommonModule } from 'src/common/common.module';
 import { SaleBiddingModel } from './entities/sale-bidding.entity';
 import { BidExecutionModel } from './entities/bid-execution.entity';
-import { AuctionsConsumer } from './auction.consumer';
+// import { AuctionsConsumer } from './auction.consumer';
 import { BullModule } from '@nestjs/bull';
 
 @Module({
@@ -32,7 +32,7 @@ import { BullModule } from '@nestjs/bull';
     PaymentsModule,
   ],
   controllers: [AuctionsController],
-  providers: [AuctionsService, AuctionsConsumer],
+  providers: [AuctionsService],
   exports: [AuctionsService],
 })
 export class AuctionsModule {}

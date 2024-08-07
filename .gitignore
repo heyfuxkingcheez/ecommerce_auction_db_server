@@ -47,3 +47,8 @@ lerna-debug.log*
 # temp directory
 .temp
 .tmp
+
+# Redis data directory
+redis_data/
+appendonly.aof*
+*.aof
