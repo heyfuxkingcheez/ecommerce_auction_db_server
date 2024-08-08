@@ -64,11 +64,6 @@ export class SettlementAccountsService {
         },
       });
 
-    if (!latestAccount)
-      throw new NotFoundException(
-        '등록된 계좌가 없습니다.',
-      );
-
     return latestAccount;
   }
 

@@ -30,6 +30,7 @@ import { DEFAULT_PROFILE_IAMGE } from 'src/common/const/default_value.const';
 import { PaymentsModel } from '../../payments/entities/payments.entity';
 import { PurchaseBiddingModel } from 'src/auctions/entities/purchase-bidding.entity';
 import { SaleBiddingModel } from 'src/auctions/entities/sale-bidding.entity';
+import { UserCouponModel } from 'src/coupons/entities/user-coupon.entity';
 
 @Entity()
 export class UserModel extends BaseModel {
@@ -119,4 +120,10 @@ export class UserModel extends BaseModel {
     (salebidding) => salebidding.user,
   )
   saleBidding: SaleBiddingModel[];
+
+  @OneToMany(
+    () => UserCouponModel,
+    (userCoupon) => userCoupon.user,
+  )
+  user_coupon: UserCouponModel[];
 }

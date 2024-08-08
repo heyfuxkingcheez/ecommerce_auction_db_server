@@ -27,6 +27,8 @@ import { BullModule } from '@nestjs/bull';
 import { AppConsumer } from './app.consumer';
 import { AuctionsModule } from './auctions/auctions.module';
 import { RedlockModule } from './redlock/redlock.module';
+import { CouponsModule } from './coupons/coupons.module';
+import { UserCouponModel } from './coupons/entities/user-coupon.entity';
 
 @Module({
   imports: [
@@ -75,6 +77,7 @@ import { RedlockModule } from './redlock/redlock.module';
     ItemOptionsModule,
     AuctionsModule,
     RedlockModule,
+    CouponsModule,
   ],
   controllers: [AppController],
   providers: [
