@@ -15,7 +15,7 @@
 **브로셔** : https://roasted-crush-68f.notion.site/364d31141e0a42b6952cfc3b3ed96eec?pvs=4
 
 ## ERD
-![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/a5b6105b-2c9c-44a4-91ca-fee26b2c2da7/5a4b93f9-63d3-4201-9c04-59952e09f362/image.png)
+![image](https://github.com/user-attachments/assets/184ec4bb-2ee5-4a6b-b4c3-e3d26e8d030b)
 
 ## 기능
 
