@@ -12,6 +12,8 @@
 
 **API 명세서** :  https://documenter.getpostman.com/view/35023103/2sA3s3JrQN
 
+**브로셔** : https://roasted-crush-68f.notion.site/364d31141e0a42b6952cfc3b3ed96eec?pvs=4
+
 ## 기능
 
 | 기능명                       | 설명                                                                 |
