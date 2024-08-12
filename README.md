@@ -7,6 +7,8 @@
 
 위와 같은 서비스를 제공하는 플랫폼에서 중개자, 정품 보증 역할을 맡기 때문에 판매자는 정품 보증을 위한 작업이 없어지고, 구매자는 보증 가능한 정품을 구매하는 데 있어 신뢰를 가질 수 있기 떄문에 불필요한 프로세스가 없어 이용자들이 편리하게 사용할 수 있습니다
 
+## 링크
+
 **GITHUB** :  https://github.com/heyfuxkingcheez/ecommerce_auction_db_server
 
 **API 명세서** :  https://documenter.getpostman.com/view/35023103/2sA3s3JrQN
