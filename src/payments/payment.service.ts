@@ -13,8 +13,11 @@ import { CardInfoDto } from './dto/card-info.dto';
 import fetch from 'node-fetch';
 import * as bcrypt from 'bcrypt';
 import { v7 as uuidv7 } from 'uuid';
-import { stringValidationMessage } from './../common/validation-message/string-validation.message';
-import { StringSchema } from 'joi';
+
+enum BillingKeyEnum {
+  ISSUED = 'ISSUED',
+  DELETED = 'DELETED',
+}
 
 @Injectable()
 export class PaymentsService {
@@ -97,6 +100,56 @@ export class PaymentsService {
         },
       },
     });
+  }
+
+  async getPaymentsInfoByUserId(userId: string) {
+    const apiSecret =
+      this.configService.get<string>('API_SECRET');
+    const requestBody = encodeURIComponent(
+      JSON.stringify({
+        filter: {
+          customerId: userId,
+          status: [BillingKeyEnum.ISSUED],
+        },
+        sort: {
+          order: 'DESC',
+        },
+      }),
+    );
+
+    const response = await fetch(
+      `https://api.portone.io/billing-keys?requestBody=${requestBody}`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `PortOne ${apiSecret}`,
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+
+    const billingKeyInfo = await response.json();
+
+    if (!response.ok)
+      throw new InternalServerErrorException(
+        `issueResponse: ${billingKeyInfo.message}`,
+      );
+
+    // billingKeyInfo.items.forEach(async (element) => {
+    //   await this.DeletePaymentWithBillingKey(
+    //     element.billingKey,
+    //     userId,
+    //   );
+    //   // console.log(element);
+    // });
+
+    const cards = billingKeyInfo.items.map((card) => ({
+      id: card.billingKey,
+      name: card.methods[0].card.name.slice(0, 2),
+      number: card.methods[0].card.number,
+    }));
+
+    return cards;
   }
 
   async getBillingKeyById(
@@ -182,7 +235,6 @@ export class PaymentsService {
         Authorization: `PortOne ${apiSecret}`,
         'Content-Type': 'application/json',
       },
-      body: '{}',
     };
     try {
       const existBillingKey =
@@ -209,7 +261,7 @@ export class PaymentsService {
         existBillingKey.id,
       );
     } catch (error) {
-      // console.error(error);
+      console.error(error);
       throw error;
     }
   }

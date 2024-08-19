@@ -26,11 +26,11 @@ export class CouponModel extends BaseModel {
 
   @IsDate()
   @Column({ type: 'timestamp' })
-  issued_at: Timestamp;
+  issued_at: Date;
 
   @IsDate()
   @Column({ type: 'timestamp' })
-  expired_at: Timestamp;
+  expired_at: Date;
 
   @IsEnum(CouponStatusEnum)
   @Column({ default: CouponStatusEnum.PENDING })

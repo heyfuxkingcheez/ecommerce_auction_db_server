@@ -7,6 +7,7 @@ import * as path from 'path';
 import { TEMP_FOLDER_PATH } from './common/const/path.const';
 import { scheduleJob } from 'node-schedule';
 import { HttpExceptionFilter } from './common/exception-filter/http.exception-filter';
+import * as cookieParser from 'cookie-parser';
 
 function deleteOldFiles() {
   const files = fs.readdirSync(TEMP_FOLDER_PATH);
@@ -27,8 +28,12 @@ function deleteOldFiles() {
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  app.enableCors();
-
+  app.setGlobalPrefix('api');
+  app.enableCors({
+    origin: 'http://localhost:3001',
+    credentials: true, // 쿠키를 사용할 수 있게 해당 값을 true로 설정
+  });
+  app.use(cookieParser());
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,

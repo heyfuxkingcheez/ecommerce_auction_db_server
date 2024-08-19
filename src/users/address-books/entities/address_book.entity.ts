@@ -1,4 +1,8 @@
-import { IsNumber, IsString } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+} from 'class-validator';
 import { PurchaseBiddingModel } from 'src/auctions/entities/purchase-bidding.entity';
 import { BaseModel } from 'src/common/entities';
 import { UserModel } from 'src/users/entities';
@@ -13,18 +17,22 @@ import {
 export class AddressBookModel extends BaseModel {
   @Column()
   @IsString()
+  @IsNotEmpty()
   address_name: string;
 
   @Column()
   @IsString()
+  @IsNotEmpty()
   name: string;
 
   @Column()
-  @IsNumber()
-  zip_code: number;
+  @IsString()
+  @IsNotEmpty()
+  zip_code: string;
 
   @Column()
   @IsString()
+  @IsNotEmpty()
   address: string;
 
   @ManyToOne(() => UserModel, (user) => user.address_books)

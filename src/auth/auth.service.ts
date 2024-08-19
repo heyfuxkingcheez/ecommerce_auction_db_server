@@ -167,7 +167,9 @@ export class AuthService {
       });
     } catch (error) {
       console.log(error);
-      throw new UnauthorizedException('잘못된 토큰입니다.');
+      throw new UnauthorizedException(
+        '잘못된 토큰입니다??.',
+      );
     }
   }
 }

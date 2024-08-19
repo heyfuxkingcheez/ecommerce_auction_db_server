@@ -26,9 +26,16 @@ export class UsersController {
     return await this.usersService.getAllUsers();
   }
 
-  @Patch()
+  @Get('/me')
+  async getUserByuserId(
+    @User('id') userId: string,
+  ): Promise<UserModel> {
+    return await this.usersService.getUserById(userId);
+  }
+
+  @Patch('/me')
   @UseInterceptors(TransactionInterceptor)
-  async patchUserById(
+  async patchUserByuserId(
     @User('id') userId: string,
     @Body() dto: UpdateUserDto,
     @QueryRunner() qr: QR,

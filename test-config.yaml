@@ -1,0 +1,9 @@
+config:
+  target: http://localhost:3000
+  phases:
+    - duration: 60
+      arrivalRate: 5
+scenarios:
+  - flow:
+      - get:
+          url: '/items?order__created_at=DESC&where__item_name_kr__i_like=아식스'

@@ -3,6 +3,7 @@ import {
   Controller,
   Headers,
   Post,
+  Res,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -11,16 +12,22 @@ import { RegisterUserDto } from './dto/registerUser.dto';
 import { BasicTokenGuard } from './guard/basic-token.guard';
 import { IsPublic } from 'src/common/decorator/is-public.decorator';
 import { RefreshTokenGuard } from './guard/bearer-token.guard';
+import { Response } from 'express';
+import { ConfigService } from '@nestjs/config';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly configService: ConfigService,
+  ) {}
 
   @Post('login')
   @IsPublic()
   @UseGuards(BasicTokenGuard)
-  postLoginEmail(
+  async postLoginEmail(
     @Headers('authorization') rawToken: string,
+    @Res() res: Response,
   ) {
     const token = this.authService.extractTokenFromHeader(
       rawToken,
@@ -30,7 +37,36 @@ export class AuthController {
     const credentials =
       this.authService.decodeBasicToken(token);
 
-    return this.authService.loginWithEmail(credentials);
+    const { accessToken, refreshToken } =
+      await this.authService.loginWithEmail(credentials);
+
+    res.cookie('AccessToken', `Bearer ${accessToken}`, {
+      // httpOnly: true,
+      secure: false,
+      maxAge: this.configService.get<number>(
+        'JWT_ACCESS_EXP',
+      ),
+
+      sameSite: 'strict',
+      path: '/',
+    });
+
+    res.cookie('RefreshToken', `Bearer ${refreshToken}`, {
+      // httpOnly: true,
+      secure: false,
+      maxAge: this.configService.get<number>(
+        'JWT_REFRESH_EXP',
+      ),
+      sameSite: 'strict',
+      path: '/',
+    });
+    res.send({
+      STATUS_CODES: 200,
+      MESSAGE: '로그인 성공',
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+    });
+    return;
   }
 
   @Post('register')

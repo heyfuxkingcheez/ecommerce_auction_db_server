@@ -76,3 +76,14 @@ services:
     env_file:
       - .env
     entrypoint: ['redis-server', '--appendonly', 'yes']
+  nginx:
+    image: nginx:1.27.0
+    container_name: nginx
+    environment:
+      - TZ=Asia/Seoul
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - /dkr/nginx/config/conf.d:/etc/nginx/conf.d
+    restart: always
