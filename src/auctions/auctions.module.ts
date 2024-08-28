@@ -11,6 +11,8 @@ import { SaleBiddingModel } from './entities/sale-bidding.entity';
 import { BidExecutionModel } from './entities/bid-execution.entity';
 // import { AuctionsConsumer } from './auction.consumer';
 import { BullModule } from '@nestjs/bull';
+import { ItemsModule } from 'src/items/items.module';
+import { SseModule } from 'src/sse/sse.module';
 
 @Module({
   imports: [
@@ -30,6 +32,8 @@ import { BullModule } from '@nestjs/bull';
     AddressBooksModule,
     CommonModule,
     PaymentsModule,
+    ItemsModule,
+    SseModule,
   ],
   controllers: [AuctionsController],
   providers: [AuctionsService],

@@ -36,6 +36,12 @@ export class ItemsController {
     return await this.itemsService.paginateItems(query);
   }
 
+  @Get(':itemId')
+  @IsPublic()
+  async getItemByItemId(@Param('itemId') itemId: string) {
+    return await this.itemsService.getItemByItemId(itemId);
+  }
+
   @Post()
   @Roles(RolesEnum.ADMIN)
   @UseInterceptors(TransactionInterceptor)

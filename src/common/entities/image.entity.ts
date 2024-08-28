@@ -7,7 +7,10 @@ import {
   IsString,
 } from 'class-validator';
 import { Transform } from 'class-transformer';
-import { ITEM_IMAGE_PATH } from '../const/path.const';
+import {
+  ITEM_IMAGE_PATH,
+  ITEM_PUBLIC_IMAGE_PATH,
+} from '../const/path.const';
 import { join } from 'path';
 import { ItemModel } from 'src/items/entities/item.entity';
 
@@ -35,7 +38,7 @@ export class ImageModel extends BaseModel {
   @IsString()
   @Transform(({ value, obj }) => {
     if (obj.type === ImageModelType.ITEM_IMAGE) {
-      return join(ITEM_IMAGE_PATH, value);
+      return join(ITEM_PUBLIC_IMAGE_PATH, value);
     } else {
       return value;
     }

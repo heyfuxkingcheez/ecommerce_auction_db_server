@@ -9,6 +9,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CreateItemOptionDto } from './dto/create-item_option.dto';
 import { UpdateItemOptionDto } from './dto/update-item_option.dto';
 import { ItemOptionEnum } from '../const/itemOpion.const';
+import { ItemModel } from '../entities/item.entity';
+import { BiddingStatusEnum } from 'src/auctions/const/bidding-status.const';
 
 @Injectable()
 export class ItemOptionsService {
@@ -22,7 +24,7 @@ export class ItemOptionsService {
     itemId: string,
   ): Promise<ItemOptionModel> {
     const existItemOption =
-      await this.existsItemOptionByOption(dto.option);
+      await this.findItemOptionByOption(dto.option, itemId);
 
     if (existItemOption)
       throw new BadRequestException(
@@ -41,10 +43,10 @@ export class ItemOptionsService {
 
   async patchItemOption(
     dto: UpdateItemOptionDto,
-    itemOptionId: string,
+    itemId: string,
   ): Promise<ItemOptionModel> {
     const existItemOption =
-      await this.existsItemOptionByOption(dto.option);
+      await this.findItemOptionByOption(dto.option, itemId);
 
     if (existItemOption)
       throw new BadRequestException(
@@ -52,7 +54,9 @@ export class ItemOptionsService {
       );
 
     const itemOption =
-      await this.getItemOpionByItemOptionId(itemOptionId);
+      await this.getItemOpionByItemOptionId(
+        existItemOption.id,
+      );
 
     await this.itemOptionRepository.update(
       { id: itemOption.id },
@@ -60,7 +64,7 @@ export class ItemOptionsService {
     );
 
     return await this.getItemOpionByItemOptionId(
-      itemOptionId,
+      existItemOption.id,
     );
   }
 
@@ -90,6 +94,21 @@ export class ItemOptionsService {
     return itemOption;
   }
 
+  async getItemOptionWithItemAndImagesByItemOptionId(
+    itemOptionId: string,
+  ) {
+    const itemOption = await this.itemOptionRepository
+      .createQueryBuilder('itemOption')
+      .leftJoinAndSelect('itemOption.item', 'item')
+      .leftJoinAndSelect('item.images', 'images')
+      .where('itemOption.id = :itemOptionId', {
+        itemOptionId,
+      })
+      .getOne();
+
+    return itemOption;
+  }
+
   async getItemOptionsByItemId(
     itemId: string,
   ): Promise<ItemOptionModel[]> {
@@ -103,16 +122,68 @@ export class ItemOptionsService {
     });
   }
 
-  async existsItemOptionByOption(
+  async findItemOptionByOption(
     option: ItemOptionEnum,
-  ): Promise<boolean> {
+    itemId: string,
+  ): Promise<ItemOptionModel> {
     const existsItemOption =
-      await this.itemOptionRepository.exists({
+      await this.itemOptionRepository.findOne({
         where: {
           option,
+          item: {
+            id: itemId,
+          },
         },
       });
 
     return existsItemOption;
+  }
+
+  async getPurchaseBiddingLowestPriceByItemOption(
+    itemOptionId: string,
+  ) {
+    const itemOption = await this.itemOptionRepository
+      .createQueryBuilder('itemOption')
+      .leftJoinAndSelect(
+        'itemOption.purchaseBidding',
+        'purchaseBidding',
+      )
+      .where('itemOption.id = :itemOptionId', {
+        itemOptionId,
+      })
+      .andWhere('purchaseBidding.status = :status', {
+        status: BiddingStatusEnum.ONGOING,
+      })
+      .orderBy('purchaseBidding.price', 'ASC')
+      .limit(1) // price가 가장 낮은 하나만 가져오기 위해 제한
+      .getOne();
+
+    return itemOption;
+  }
+
+  async getSaleBiddingLowestPriceByItemOption(
+    itemOptionId: string,
+  ) {
+    const itemOption = await this.itemOptionRepository
+      .createQueryBuilder('itemOption')
+      .leftJoinAndSelect('itemOption.item', 'item')
+      .leftJoinAndSelect('item.images', 'images')
+      .leftJoinAndSelect(
+        'itemOption.saleBidding',
+        'saleBidding',
+      )
+      .where('itemOption.id = :itemOptionId', {
+        itemOptionId,
+      })
+      .andWhere('saleBidding.status = :status', {
+        status: BiddingStatusEnum.ONGOING,
+      })
+      .orderBy('saleBidding.price', 'ASC')
+      .limit(1) // price가 가장 낮은 하나만 가져오기 위해 제한
+      .getOne();
+
+    console.log(itemOption);
+
+    return itemOption;
   }
 }

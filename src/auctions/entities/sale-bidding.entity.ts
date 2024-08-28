@@ -10,6 +10,7 @@ import { IsDate, IsEnum, IsNumber } from 'class-validator';
 import { UserModel } from 'src/users/entities';
 import { ItemOptionModel } from 'src/items/item_options/entities/item-option.entitiy';
 import { BidExecutionModel } from './bid-execution.entity';
+import { AddressBookModel } from 'src/users/address-books/entities/address_book.entity';
 
 @Entity()
 export class SaleBiddingModel extends BaseModel {
@@ -33,6 +34,12 @@ export class SaleBiddingModel extends BaseModel {
     (itemOption) => itemOption.saleBidding,
   )
   itemOption: ItemOptionModel;
+
+  @ManyToOne(
+    () => AddressBookModel,
+    (address) => address.saleBidding,
+  )
+  address: AddressBookModel;
 
   @OneToMany(
     () => BidExecutionModel,

@@ -9,6 +9,7 @@ import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
 import { PaginateItemDto } from './dto/paginate-item.dto';
 import { CommonService } from 'src/common/common.service';
+import { BiddingStatusEnum } from 'src/auctions/const/bidding-status.const';
 
 @Injectable()
 export class ItemsService {
@@ -69,11 +70,13 @@ export class ItemsService {
   async getItemByItemId(itemId: string, qr?: QueryRunner) {
     const repo = this.getRepository(qr);
 
-    const item = await repo.findOne({
-      where: {
-        id: itemId,
-      },
-    });
+    const item = await repo
+      .createQueryBuilder('item')
+      .leftJoinAndSelect('item.images', 'images')
+      .leftJoinAndSelect('item.itemOptions', 'itemOptions')
+      .where('item.id = :itemId', { itemId })
+      .orderBy('itemOptions.option', 'ASC') // 여기서 option을 기준으로 정렬
+      .getOne();
 
     if (!item)
       throw new BadRequestException(
@@ -118,5 +121,49 @@ export class ItemsService {
     return qr
       ? qr.manager.getRepository<ItemModel>(ItemModel)
       : this.itemRepository;
+  }
+
+  async getItemSaleBiddingLowestPrice(itemId: string) {
+    console.log('판매비드 찾기');
+
+    const itemsWithLowestBid = await this.itemRepository
+      .createQueryBuilder('item')
+      .leftJoinAndSelect('item.itemOptions', 'itemOption')
+      .leftJoin('itemOption.saleBidding', 'saleBidding')
+      .addSelect(
+        'MIN(saleBidding.price)',
+        'minSaleBiddingPrice',
+      )
+      .where('item.id = :itemId', { itemId })
+      .andWhere('saleBidding.status = :status', {
+        status: BiddingStatusEnum.ONGOING,
+      })
+      .groupBy('item.id, itemOption.id')
+      .getRawMany();
+
+    return itemsWithLowestBid;
+  }
+
+  async getItemPurchaseBiddingLowestPrice(itemId: string) {
+    console.log('구매비드 찾기');
+    const itemsWithLowestBid = await this.itemRepository
+      .createQueryBuilder('item')
+      .leftJoinAndSelect('item.itemOptions', 'itemOption')
+      .leftJoin(
+        'itemOption.purchaseBidding',
+        'purchaseBidding',
+      )
+      .addSelect(
+        'MIN(purchaseBidding.price)',
+        'minPurchaseBiddingPrice',
+      )
+      .where('item.id = :itemId', { itemId })
+      .andWhere('purchaseBidding.status = :status', {
+        status: BiddingStatusEnum.ONGOING,
+      })
+      .groupBy('item.id, itemOption.id')
+      .getRawMany();
+
+    return itemsWithLowestBid;
   }
 }

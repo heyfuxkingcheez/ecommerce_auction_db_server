@@ -38,6 +38,18 @@ export class PaymentsService {
     const hashRounds =
       this.configService.get<string>('HASH_ROUNDS');
 
+    const hash = bcrypt.hashSync(
+      dto.payment_password,
+      +hashRounds,
+    );
+
+    const newPayment = this.paymentsRepository.create({
+      user: {
+        id: userId,
+      },
+      payment_password: hash,
+    });
+
     const issueResponse = await fetch(
       'https://api.portone.io/billing-keys',
       {
@@ -63,6 +75,7 @@ export class PaymentsService {
               },
             },
           },
+          customData: newPayment.id,
         }),
       },
     );
@@ -76,18 +89,7 @@ export class PaymentsService {
       billingKeyInfo: { billingKey },
     } = await issueResponse.json();
 
-    const hash = bcrypt.hashSync(
-      dto.payment_password,
-      +hashRounds,
-    );
-
-    const newPayment = this.paymentsRepository.create({
-      user: {
-        id: userId,
-      },
-      billing_key: billingKey,
-      payment_password: hash,
-    });
+    newPayment.billing_key = billingKey;
 
     return await this.paymentsRepository.save(newPayment);
   }
@@ -129,37 +131,33 @@ export class PaymentsService {
     );
 
     const billingKeyInfo = await response.json();
+    console.log(billingKeyInfo);
 
     if (!response.ok)
       throw new InternalServerErrorException(
         `issueResponse: ${billingKeyInfo.message}`,
       );
 
-    // billingKeyInfo.items.forEach(async (element) => {
-    //   await this.DeletePaymentWithBillingKey(
-    //     element.billingKey,
-    //     userId,
-    //   );
-    //   // console.log(element);
-    // });
-
     const cards = billingKeyInfo.items.map((card) => ({
-      id: card.billingKey,
+      id: card.customData,
       name: card.methods[0].card.name.slice(0, 2),
       number: card.methods[0].card.number,
+      billingKey: card.billingKey,
     }));
+
+    console.log(cards);
 
     return cards;
   }
 
   async getBillingKeyById(
-    billngKey: string,
+    paymentId: string,
     password: string,
   ) {
     const existbillngKey =
       await this.paymentsRepository.findOne({
         where: {
-          id: billngKey,
+          id: paymentId,
         },
       });
 

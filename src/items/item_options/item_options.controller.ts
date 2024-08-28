@@ -32,6 +32,15 @@ export class ItemOptionsController {
     );
   }
 
+  @Get('/:itemOptionId')
+  async getItemOptionByItemOptionId(
+    @Param('itemOptionId') itemOptionId: string,
+  ) {
+    return await this.itemOptionsService.getItemOptionWithItemAndImagesByItemOptionId(
+      itemOptionId,
+    );
+  }
+
   @Post()
   @Roles(RolesEnum.ADMIN)
   async postItemOpiton(
@@ -49,11 +58,11 @@ export class ItemOptionsController {
   @Roles(RolesEnum.ADMIN)
   async patchItemOption(
     @Body() dto: UpdateItemOptionDto,
-    @Param('itemOpitonId') itemOpitonId: string,
+    @Param('itemId') itemId: string,
   ) {
     return await this.itemOptionsService.patchItemOption(
       dto,
-      itemOpitonId,
+      itemId,
     );
   }
 
@@ -63,6 +72,24 @@ export class ItemOptionsController {
     @Param('itemOpionId') itemOptionId: string,
   ) {
     return await this.itemOptionsService.deleteItemOption(
+      itemOptionId,
+    );
+  }
+
+  @Get(':itemOptionId/purchase')
+  async getPurchaseBiddingByItemOptionId(
+    @Param('itemOptionId') itemOptionId: string,
+  ) {
+    return await this.itemOptionsService.getPurchaseBiddingLowestPriceByItemOption(
+      itemOptionId,
+    );
+  }
+
+  @Get(':itemOptionId/sale')
+  async getSaleBiddingByItemOptionId(
+    @Param('itemOptionId') itemOptionId: string,
+  ) {
+    return await this.itemOptionsService.getSaleBiddingLowestPriceByItemOption(
       itemOptionId,
     );
   }

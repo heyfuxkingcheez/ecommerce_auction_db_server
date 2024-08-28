@@ -23,6 +23,8 @@ import { BidExecutionModel } from './entities/bid-execution.entity';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 import Redlock, { Lock } from 'redlock';
+import { ItemsService } from 'src/items/items.service';
+import { SseService } from 'src/sse/sse.service';
 
 @Injectable()
 export class AuctionsService {
@@ -34,19 +36,15 @@ export class AuctionsService {
     private readonly saleBiddingRepository: Repository<SaleBiddingModel>,
     @InjectRepository(BidExecutionModel)
     private readonly bidExecutionRepository: Repository<BidExecutionModel>,
-    @InjectQueue('auction')
-    private readonly auctionQueue: Queue,
     @InjectQueue('payment')
     private readonly reqBillingKey: Queue,
     private readonly itemOptionService: ItemOptionsService,
+    private readonly itemsService: ItemsService,
     private readonly paymentsService: PaymentsService,
     private readonly addressBooksService: AddressBooksService,
     @Inject('Redlock') private readonly redlock: Redlock,
-  ) {
-    this.auctionQueue.on('error', (error) => {
-      console.error('Queue error:', error);
-    });
-  }
+    private readonly sseService: SseService,
+  ) {}
 
   getPurchaseBiddingRepository(qr?: QueryRunner) {
     return qr
@@ -70,20 +68,23 @@ export class AuctionsService {
       : this.bidExecutionRepository;
   }
 
-  async getPurchaseBiddingById(purchaseBiddingId: string) {
-    const purchaseBid =
-      await this.purchaseBiddingRepository.findOne({
-        where: {
-          id: purchaseBiddingId,
-        },
-        relations: ['payment', 'user'],
-      });
+  async getPurchaseBiddingById(
+    purchaseBiddingId: string,
+    qr: QueryRunner,
+  ) {
+    const repo = this.getPurchaseBiddingRepository(qr);
+
+    const purchaseBid = await repo.findOne({
+      where: {
+        id: purchaseBiddingId,
+      },
+      relations: ['payment', 'user'],
+    });
 
     if (!purchaseBid.payment)
       throw new NotFoundException(
         '등록된 결제 정보가 없습니다.',
       );
-
     return purchaseBid;
   }
 
@@ -99,10 +100,11 @@ export class AuctionsService {
         dto.itemOptionId,
       );
 
-      await this.paymentsService.getBillingKeyById(
-        dto.paymentId,
-        dto.payment_password,
-      );
+      const paymentId =
+        await this.paymentsService.getBillingKeyById(
+          dto.paymentId,
+          dto.payment_password,
+        );
 
       await this.addressBooksService.getAddressById(
         dto.addressId,
@@ -114,7 +116,7 @@ export class AuctionsService {
           id: userId,
         },
         payment: {
-          id: dto.paymentId,
+          id: paymentId.id,
         },
         address: {
           id: dto.addressId,
@@ -127,13 +129,17 @@ export class AuctionsService {
         delivery_instruction: dto.delivery_instruction,
       });
 
-      await repo.save(purchaseBid);
+      const result = await repo.save(purchaseBid);
 
       await this.findMatchingBids(
-        dto.itemOptionId,
-        dto.price,
+        result.itemOption.id,
+        result.price,
+        userId,
         qr,
+        true,
       );
+
+      return result;
     } catch (error) {
       throw error;
     }
@@ -157,17 +163,24 @@ export class AuctionsService {
         itemOption: {
           id: dto.itemOptionId,
         },
+        address: {
+          id: dto.addressId,
+        },
         expired_date: dto.expired_date,
         price: dto.price,
       });
 
-      await repo.save(saleBid);
+      const result = await repo.save(saleBid);
 
       await this.findMatchingBids(
         dto.itemOptionId,
         dto.price,
+        userId,
         qr,
+        false,
       );
+
+      return result;
     } catch (error) {
       throw error;
     }
@@ -204,7 +217,9 @@ export class AuctionsService {
   async findMatchingBids(
     itemOptionId: string,
     price: number,
+    userId: string,
     qr?: QueryRunner,
+    isPurchase?: boolean,
   ) {
     const lock = await this.redlock.acquire(
       [`${itemOptionId}`],
@@ -228,11 +243,39 @@ export class AuctionsService {
         );
 
       if (saleBid && purchaseBid) {
+        if (
+          isPurchase === false &&
+          saleBid.price < purchaseBid.price
+        ) {
+          const repo = this.getSaleBiddingRepository(qr);
+          await repo.update(saleBid.id, {
+            price: purchaseBid.price,
+          });
+        } else if (
+          isPurchase === true &&
+          saleBid.price > purchaseBid.price
+        ) {
+          const repo =
+            this.getPurchaseBiddingRepository(qr);
+          await repo.update(purchaseBid.id, {
+            price: saleBid.price,
+          });
+        }
         await this.updateSaleBidStatus(saleBid.id, qr);
 
         await this.updatePurchaseBidStatus(
           purchaseBid.id,
           qr,
+        );
+
+        this.sseService.emitEvent(
+          saleBid.user.id,
+          `판매 완료_${saleBid.itemOption}[${saleBid.itemOption.option}]:판매 입찰이 체결되었습니다.`,
+        );
+
+        this.sseService.emitEvent(
+          purchaseBid.user.id,
+          `구매 완료_${purchaseBid.itemOption}[${purchaseBid.itemOption.option}]:구매 입찰이 체결되었습니다.`,
         );
 
         await this.matchingBids(
@@ -348,6 +391,7 @@ export class AuctionsService {
 
       const billingKey = await this.getPurchaseBiddingById(
         purchaseBiddingId,
+        qr,
       );
 
       await this.reqBillingKey.add(
@@ -426,7 +470,7 @@ export class AuctionsService {
   async findBidByItemOptionAndPrice(
     itemOptionId: string,
     price: number,
-    isPurchase: true | false,
+    isPurchase: boolean,
     qr?: QueryRunner,
   ) {
     let BidRepo:
@@ -442,8 +486,8 @@ export class AuctionsService {
           id: itemOptionId,
         },
         price: isPurchase
-          ? LessThanOrEqual(price)
-          : MoreThanOrEqual(price),
+          ? MoreThanOrEqual(price)
+          : LessThanOrEqual(price),
         expired_date: MoreThan(new Date()),
         status: BiddingStatusEnum.ONGOING,
       },
@@ -451,8 +495,27 @@ export class AuctionsService {
         id: 'ASC',
         price: isPurchase ? 'DESC' : 'ASC',
       },
+      relations: ['user', 'itemOption'],
     });
 
     return bid;
+  }
+
+  async getBiddingByItemId(
+    itemId: string,
+    isPurchase: boolean,
+  ) {
+    let result;
+    isPurchase
+      ? (result =
+          await this.itemsService.getItemPurchaseBiddingLowestPrice(
+            itemId,
+          ))
+      : (result =
+          await this.itemsService.getItemSaleBiddingLowestPrice(
+            itemId,
+          ));
+
+    return result;
   }
 }

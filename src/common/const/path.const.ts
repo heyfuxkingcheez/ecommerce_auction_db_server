@@ -39,6 +39,11 @@ export const USER_PUBLIC_PROFILE_IMAGE_PATH = join(
   PUBLIC_FOLDER_NAME,
   USERS_FOLDER_NAME,
 );
+// /public/items/xxx.jpg
+export const ITEM_PUBLIC_IMAGE_PATH = join(
+  PUBLIC_FOLDER_NAME,
+  ITEM_FOLDER_NAME,
+);
 
 // 임시 파일들을 저장할 폴더
 // {프로젝트 경로}/temp

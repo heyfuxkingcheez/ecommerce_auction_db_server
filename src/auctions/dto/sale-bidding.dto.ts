@@ -8,4 +8,7 @@ export class SaleBiddingDto extends PickType(
 ) {
   @IsString()
   itemOptionId: string;
+
+  @IsString()
+  addressId: string;
 }

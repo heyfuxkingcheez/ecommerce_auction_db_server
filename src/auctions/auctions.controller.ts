@@ -1,6 +1,8 @@
 import {
   Body,
   Controller,
+  Get,
+  Param,
   Post,
   UseInterceptors,
 } from '@nestjs/common';
@@ -43,6 +45,26 @@ export class AuctionsController {
       userId,
       dto,
       qr,
+    );
+  }
+
+  @Get('purchase-bid/:itemId')
+  async getPurchaseBiddingByItemId(
+    @Param('itemId') itemId: string,
+  ) {
+    return await this.auctionsService.getBiddingByItemId(
+      itemId,
+      true,
+    );
+  }
+
+  @Get('sale-bid/:itemId')
+  async getSaleBiddingByItemId(
+    @Param('itemId') itemId: string,
+  ) {
+    return await this.auctionsService.getBiddingByItemId(
+      itemId,
+      false,
     );
   }
 }

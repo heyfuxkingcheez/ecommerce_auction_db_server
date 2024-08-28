@@ -29,6 +29,7 @@ import { AuctionsModule } from './auctions/auctions.module';
 import { RedlockModule } from './redlock/redlock.module';
 import { CouponsModule } from './coupons/coupons.module';
 import { UserCouponModel } from './coupons/entities/user-coupon.entity';
+import { SseModule } from './sse/sse.module';
 
 @Module({
   imports: [
@@ -78,6 +79,7 @@ import { UserCouponModel } from './coupons/entities/user-coupon.entity';
     AuctionsModule,
     RedlockModule,
     CouponsModule,
+    SseModule,
   ],
   controllers: [AppController],
   providers: [
