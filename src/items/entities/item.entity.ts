@@ -7,6 +7,7 @@ import { BaseModel } from 'src/common/entities';
 import { ImageModel } from 'src/common/entities/image.entity';
 import { Column, Entity, OneToMany } from 'typeorm';
 import { ItemOptionModel } from '../item_options/entities/item-option.entitiy';
+import { TagItemModel } from 'src/tags/entities/tag-item.entity';
 
 @Entity()
 export class ItemModel extends BaseModel {
@@ -34,6 +35,9 @@ export class ItemModel extends BaseModel {
 
   @OneToMany((type) => ImageModel, (image) => image.item)
   images: ImageModel[];
+
+  @OneToMany(() => TagItemModel, (tagItem) => tagItem.item)
+  tagItem: TagItemModel[];
 
   @OneToMany(
     (type) => ItemOptionModel,

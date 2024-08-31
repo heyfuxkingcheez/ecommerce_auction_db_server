@@ -7,19 +7,20 @@ import {
   FindManyOptions,
   FindOptionsOrder,
   FindOptionsWhere,
+  QueryRunner,
   Repository,
 } from 'typeorm';
 import { BaseModel } from './entities';
 import { FILTER_MAPPER } from './const/filter-mapper.const';
 import { ConfigService } from '@nestjs/config';
-import { InjectQueue } from '@nestjs/bull';
-import { Queue } from 'bull';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class CommonService {
   constructor(
     private readonly configService: ConfigService,
   ) {}
+
   paginate<T extends BaseModel>(
     dto: BasePaginationDto,
     repository: Repository<T>,

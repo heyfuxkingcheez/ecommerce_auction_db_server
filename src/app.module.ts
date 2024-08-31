@@ -30,6 +30,7 @@ import { RedlockModule } from './redlock/redlock.module';
 import { CouponsModule } from './coupons/coupons.module';
 import { UserCouponModel } from './coupons/entities/user-coupon.entity';
 import { SseModule } from './sse/sse.module';
+import { TagsModule } from './tags/tags.module';
 
 @Module({
   imports: [
@@ -80,6 +81,7 @@ import { SseModule } from './sse/sse.module';
     RedlockModule,
     CouponsModule,
     SseModule,
+    TagsModule,
   ],
   controllers: [AppController],
   providers: [
