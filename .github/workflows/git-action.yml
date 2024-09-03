@@ -16,7 +16,7 @@ jobs:
 
       run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
     - name: Build the docker image
-      run: docker buil -t ecommerce_auction_backend .
+      run: docker build -t ecommerce_auction_backend .
     - name: taging
       run: docker tag ecommerce_auction_backend:latest woogionandon/ecommerce_auction_backend:latest
     - name: Push to Dockerhhub
