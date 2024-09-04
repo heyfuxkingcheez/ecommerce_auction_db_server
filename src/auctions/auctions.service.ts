@@ -130,6 +130,7 @@ export class AuctionsService {
       });
 
       const result = await repo.save(purchaseBid);
+      console.log(result);
 
       await this.findMatchingBids(
         result.itemOption.id,
