@@ -40,6 +40,24 @@ import Redlock from 'redlock';
           ),
         });
 
+        [
+          redisLock1,
+          redisLock2,
+          redisLock3,
+          redisLock4,
+          redisLock5,
+        ].forEach((client, index) => {
+          client.on('connect', () =>
+            console.log(`redis_lock${index + 1} connected`),
+          );
+          client.on('error', (err) =>
+            console.error(
+              `Error in redis_lock${index + 1}:`,
+              err,
+            ),
+          );
+        });
+
         return new Redlock(
           [
             redisLock1,
