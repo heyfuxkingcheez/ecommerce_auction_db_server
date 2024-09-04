@@ -9,32 +9,35 @@ import Redlock from 'redlock';
     {
       provide: 'Redlock',
       useFactory: (configService: ConfigService) => {
+        console.log(
+          configService.get<number>('REDIS_LOCK1_PORT'),
+        );
         const redisLock1 = new Redis({
-          host: 'redis_lock1',
+          host: 'redis-server',
           port: configService.get<number>(
             'REDIS_LOCK1_PORT',
           ),
         });
         const redisLock2 = new Redis({
-          host: 'redis_lock2',
+          host: 'redis-server',
           port: configService.get<number>(
             'REDIS_LOCK2_PORT',
           ),
         });
         const redisLock3 = new Redis({
-          host: 'redis_lock3',
+          host: 'redis-server',
           port: configService.get<number>(
             'REDIS_LOCK3_PORT',
           ),
         });
         const redisLock4 = new Redis({
-          host: 'redis_lock4',
+          host: 'redis-server',
           port: configService.get<number>(
             'REDIS_LOCK4_PORT',
           ),
         });
         const redisLock5 = new Redis({
-          host: 'redis_lock5',
+          host: 'redis-server',
           port: configService.get<number>(
             'REDIS_LOCK5_PORT',
           ),
