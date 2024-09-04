@@ -10,31 +10,31 @@ import Redlock from 'redlock';
       provide: 'Redlock',
       useFactory: (configService: ConfigService) => {
         const redisLock1 = new Redis({
-          host: 'localhost',
+          host: 'redis_lock1',
           port: configService.get<number>(
             'REDIS_LOCK1_PORT',
           ),
         });
         const redisLock2 = new Redis({
-          host: 'localhost',
+          host: 'redis_lock2',
           port: configService.get<number>(
             'REDIS_LOCK2_PORT',
           ),
         });
         const redisLock3 = new Redis({
-          host: 'localhost',
+          host: 'redis_lock3',
           port: configService.get<number>(
             'REDIS_LOCK3_PORT',
           ),
         });
         const redisLock4 = new Redis({
-          host: 'localhost',
+          host: 'redis_lock4',
           port: configService.get<number>(
             'REDIS_LOCK4_PORT',
           ),
         });
         const redisLock5 = new Redis({
-          host: 'localhost',
+          host: 'redis_lock5',
           port: configService.get<number>(
             'REDIS_LOCK5_PORT',
           ),
