@@ -12,8 +12,7 @@ services:
   #     POSTGRES_DB: ${DB_DATABASE}
   ## Queue
   redis_bull:
-    image: redis:7
-    restart: always
+    image: redis:latest
     container_name: redis_bull
     ports:
       - '${REDIS_BULL_PORT}:6379'
@@ -21,14 +20,14 @@ services:
       - ./redis_data/bull:/data
     env_file:
       - .env
+    restart: always
     entrypoint: ['redis-server', '--appendonly', 'yes']
     networks:
       - backend
 
   ## Red lock
   redis_lock1:
-    image: redis:7
-    restart: always
+    image: redis:latest
     container_name: redis_lock1
     ports:
       - '${REDIS_LOCK1_PORT}:6379'
@@ -36,13 +35,13 @@ services:
       - ./redis_data/lock:/data
     env_file:
       - .env
+    restart: always
     entrypoint: ['redis-server', '--appendonly', 'yes']
     networks:
       - backend
 
   redis_lock2:
-    image: redis:7
-    restart: always
+    image: redis:latest
     container_name: redis_lock2
     ports:
       - '${REDIS_LOCK2_PORT}:6379'
@@ -50,13 +49,13 @@ services:
       - ./redis_data/lock:/data
     env_file:
       - .env
+    restart: always
     entrypoint: ['redis-server', '--appendonly', 'yes']
     networks:
       - backend
 
   redis_lock3:
-    image: redis:7
-    restart: always
+    image: redis:latest
     container_name: redis_lock3
     ports:
       - '${REDIS_LOCK3_PORT}:6379'
@@ -64,13 +63,13 @@ services:
       - ./redis_data/lock:/data
     env_file:
       - .env
+    restart: always
     entrypoint: ['redis-server', '--appendonly', 'yes']
     networks:
       - backend
 
   redis_lock4:
-    image: redis:7
-    restart: always
+    image: redis:latest
     container_name: redis_lock4
     ports:
       - '${REDIS_LOCK4_PORT}:6379'
@@ -78,13 +77,13 @@ services:
       - ./redis_data/lock:/data
     env_file:
       - .env
+    restart: always
     entrypoint: ['redis-server', '--appendonly', 'yes']
     networks:
       - backend
 
   redis_lock5:
-    image: redis:7
-    restart: always
+    image: redis:latest
     container_name: redis_lock5
     ports:
       - '${REDIS_LOCK5_PORT}:6379'
@@ -92,6 +91,7 @@ services:
       - ./redis_data/lock:/data
     env_file:
       - .env
+    restart: always
     entrypoint: ['redis-server', '--appendonly', 'yes']
     networks:
       - backend
@@ -112,16 +112,16 @@ services:
       - backend
 
   ## Backend
-  app:
-    image: woogionandon/ecommerce_auction_backend:latest
-    container_name: ecommerce_auction_backend
-    restart: always
-    ports:
-      - '${PORT}:${PORT}'
-    env_file:
-      - .env
-    networks:
-      - backend
+  # app:
+  #   image: woogionandon/ecommerce_auction_backend:latest
+  #   container_name: ecommerce_auction_backend
+  #   restart: always
+  #   ports:
+  #     - '${PORT}:${PORT}'
+  #   env_file:
+  #     - .env
+  #   networks:
+  #     - backend
 
 networks:
   backend:
