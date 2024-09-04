@@ -21,7 +21,14 @@ services:
     env_file:
       - .env
     restart: always
-    entrypoint: ['redis-server', '--appendonly', 'yes']
+    entrypoint:
+      [
+        'redis-server',
+        '--appendonly',
+        'yes',
+        '--bind',
+        '0.0.0.0',
+      ]
     networks:
       - backend
 
@@ -36,7 +43,14 @@ services:
     env_file:
       - .env
     restart: always
-    entrypoint: ['redis-server', '--appendonly', 'yes']
+    entrypoint:
+      [
+        'redis-server',
+        '--appendonly',
+        'yes',
+        '--bind',
+        '0.0.0.0',
+      ]
     networks:
       - backend
 
@@ -50,7 +64,14 @@ services:
     env_file:
       - .env
     restart: always
-    entrypoint: ['redis-server', '--appendonly', 'yes']
+    entrypoint:
+      [
+        'redis-server',
+        '--appendonly',
+        'yes',
+        '--bind',
+        '0.0.0.0',
+      ]
     networks:
       - backend
 
@@ -64,7 +85,14 @@ services:
     env_file:
       - .env
     restart: always
-    entrypoint: ['redis-server', '--appendonly', 'yes']
+    entrypoint:
+      [
+        'redis-server',
+        '--appendonly',
+        'yes',
+        '--bind',
+        '0.0.0.0',
+      ]
     networks:
       - backend
 
@@ -78,7 +106,14 @@ services:
     env_file:
       - .env
     restart: always
-    entrypoint: ['redis-server', '--appendonly', 'yes']
+    entrypoint:
+      [
+        'redis-server',
+        '--appendonly',
+        'yes',
+        '--bind',
+        '0.0.0.0',
+      ]
     networks:
       - backend
 
@@ -92,7 +127,14 @@ services:
     env_file:
       - .env
     restart: always
-    entrypoint: ['redis-server', '--appendonly', 'yes']
+    entrypoint:
+      [
+        'redis-server',
+        '--appendonly',
+        'yes',
+        '--bind',
+        '0.0.0.0',
+      ]
     networks:
       - backend
 
@@ -112,16 +154,16 @@ services:
       - backend
 
   ## Backend
-  # app:
-  #   image: woogionandon/ecommerce_auction_backend:latest
-  #   container_name: ecommerce_auction_backend
-  #   restart: always
-  #   ports:
-  #     - '${PORT}:${PORT}'
-  #   env_file:
-  #     - .env
-  #   networks:
-  #     - backend
+  app:
+    image: woogionandon/ecommerce_auction_backend:latest
+    container_name: ecommerce_auction_backend
+    restart: always
+    ports:
+      - '${PORT}:${PORT}'
+    env_file:
+      - .env
+    networks:
+      - backend
 
 networks:
   backend:
