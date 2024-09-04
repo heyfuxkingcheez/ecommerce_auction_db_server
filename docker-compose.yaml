@@ -1,15 +1,16 @@
 services:
-  postgres:
-    image: postgres:16
-    restart: always
-    volumes:
-      - ./postgres-data:/var/lib/postgresql/data
-    ports:
-      - '${DB_PORT}:5432'
-    environment:
-      POSTGRES_USER: ${DB_USERNAME}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${DB_DATABASE}
+  # postgres:
+  #   image: postgres:16
+  #   restart: always
+  #   volumes:
+  #     - ./postgres-data:/var/lib/postgresql/data
+  #   ports:
+  #     - '${DB_PORT}:5432'
+  #   environment:
+  #     POSTGRES_USER: ${DB_USERNAME}
+  #     POSTGRES_PASSWORD: ${DB_PASSWORD}
+  #     POSTGRES_DB: ${DB_DATABASE}
+  ## Queue
   redis_bull:
     image: redis:7
     restart: always
@@ -21,6 +22,10 @@ services:
     env_file:
       - .env
     entrypoint: ['redis-server', '--appendonly', 'yes']
+    networks:
+      - backend
+
+  ## Red lock
   redis_lock1:
     image: redis:7
     restart: always
@@ -32,6 +37,9 @@ services:
     env_file:
       - .env
     entrypoint: ['redis-server', '--appendonly', 'yes']
+    networks:
+      - backend
+
   redis_lock2:
     image: redis:7
     restart: always
@@ -43,6 +51,9 @@ services:
     env_file:
       - .env
     entrypoint: ['redis-server', '--appendonly', 'yes']
+    networks:
+      - backend
+
   redis_lock3:
     image: redis:7
     restart: always
@@ -54,6 +65,9 @@ services:
     env_file:
       - .env
     entrypoint: ['redis-server', '--appendonly', 'yes']
+    networks:
+      - backend
+
   redis_lock4:
     image: redis:7
     restart: always
@@ -65,6 +79,9 @@ services:
     env_file:
       - .env
     entrypoint: ['redis-server', '--appendonly', 'yes']
+    networks:
+      - backend
+
   redis_lock5:
     image: redis:7
     restart: always
@@ -76,8 +93,12 @@ services:
     env_file:
       - .env
     entrypoint: ['redis-server', '--appendonly', 'yes']
+    networks:
+      - backend
+
+  ## NginX
   nginx:
-    image: nginx:1.27.0
+    image: nginx:1.27.1
     container_name: nginx
     environment:
       - TZ=Asia/Seoul
@@ -85,5 +106,23 @@ services:
       - 80:80
       - 443:443
     volumes:
-      - /dkr/nginx/config/conf.d:/etc/nginx/conf.d
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
     restart: always
+    networks:
+      - backend
+
+  ## Backend
+  app:
+    image: woogionandon/ecommerce_auction_backend:latest
+    container_name: ecommerce_auction_backend
+    restart: always
+    ports:
+      - '${PORT}:${PORT}'
+    env_file:
+      - .env
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
