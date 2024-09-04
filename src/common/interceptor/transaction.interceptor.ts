@@ -1,6 +1,7 @@
 import {
   CallHandler,
   ExecutionContext,
+  HttpException,
   Injectable,
   InternalServerErrorException,
   NestInterceptor,
@@ -27,12 +28,18 @@ export class TransactionInterceptor
     req.queryRunner = qr;
 
     return next.handle().pipe(
-      catchError(async (e) => {
+      catchError(async (error) => {
         await qr.rollbackTransaction();
         await qr.release();
 
-        console.log(e);
-        throw new InternalServerErrorException(e.message);
+        if (error instanceof HttpException) {
+          throw error;
+        } else {
+          console.error(error);
+          throw new InternalServerErrorException(
+            '서버 오류가 발생했습니다.',
+          );
+        }
       }),
       tap(async () => {
         await qr.commitTransaction();

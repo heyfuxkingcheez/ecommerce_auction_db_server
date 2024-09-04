@@ -13,6 +13,8 @@ import { SaleBiddingDto } from './dto/sale-bidding.dto';
 import { QueryRunner as QR } from 'typeorm';
 import { QueryRunner } from 'src/common/decorator/query-runner.decorator';
 import { TransactionInterceptor } from 'src/common/interceptor/transaction.interceptor';
+import { BiddingStatusEnum } from './const/bidding-status.const';
+import { IsPublic } from 'src/common/decorator/is-public.decorator';
 
 @Controller('auctions')
 export class AuctionsController {
@@ -66,5 +68,33 @@ export class AuctionsController {
       itemId,
       false,
     );
+  }
+
+  @Get('/me/purchase-bid/:status')
+  async getUserPurchaseBiddingByUserId(
+    @User('id') userId: string,
+    @Param('status') status: BiddingStatusEnum,
+  ) {
+    return await this.auctionsService.getUserPurchaseBiddingByUserId(
+      userId,
+      status,
+    );
+  }
+
+  @Get('/me/sale-bid/:status')
+  async getUserSaleBiddingByUserId(
+    @User('id') userId: string,
+    @Param('status') status: BiddingStatusEnum,
+  ) {
+    return await this.auctionsService.getUserSaleBiddingByUserId(
+      userId,
+      status,
+    );
+  }
+
+  @Get('hot')
+  @IsPublic()
+  async getHotItemsInBids() {
+    return await this.auctionsService.getHotItemsInBids();
   }
 }

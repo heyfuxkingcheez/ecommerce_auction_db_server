@@ -10,6 +10,7 @@ import { UpdateItemDto } from './dto/update-item.dto';
 import { PaginateItemDto } from './dto/paginate-item.dto';
 import { CommonService } from 'src/common/common.service';
 import { BiddingStatusEnum } from 'src/auctions/const/bidding-status.const';
+import { TagsService } from 'src/tags/tags.service';
 
 @Injectable()
 export class ItemsService {
@@ -124,8 +125,6 @@ export class ItemsService {
   }
 
   async getItemSaleBiddingLowestPrice(itemId: string) {
-    console.log('판매비드 찾기');
-
     const itemsWithLowestBid = await this.itemRepository
       .createQueryBuilder('item')
       .leftJoinAndSelect('item.itemOptions', 'itemOption')
@@ -145,7 +144,6 @@ export class ItemsService {
   }
 
   async getItemPurchaseBiddingLowestPrice(itemId: string) {
-    console.log('구매비드 찾기');
     const itemsWithLowestBid = await this.itemRepository
       .createQueryBuilder('item')
       .leftJoinAndSelect('item.itemOptions', 'itemOption')

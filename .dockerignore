@@ -1,0 +1,6 @@
+.git
+Dockerfile
+node_modules
+.vscode
+postgres-data
+dist

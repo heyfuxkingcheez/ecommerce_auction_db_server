@@ -53,7 +53,6 @@ export class TagsService {
   }
 
   async postTagItem(dto: TagItemDto, qr?: QueryRunner) {
-    console.log(dto);
     const tagItemRepo = this.getTagItemRepository(qr);
     const tagRepo = this.getTagRepository(qr);
 
@@ -88,5 +87,40 @@ export class TagsService {
     });
 
     return await tagItemRepo.save(newTagItem);
+  }
+
+  async getTagsHaveItems(tagName: string) {
+    const items = await this.tagItemRepository
+      .createQueryBuilder('tagItem')
+      .leftJoinAndSelect('tagItem.tag', 'tag')
+      .leftJoinAndSelect('tagItem.item', 'item')
+      .leftJoinAndSelect('item.images', 'image')
+      .where('tag.tag = :tagName', { tagName })
+      .orderBy('item.id', 'DESC')
+      .getMany();
+
+    const result = items.map((tagItem) => {
+      const item = tagItem.item;
+      return {
+        id: item.id,
+        created_at: item.created_at,
+        updated_at: item.updated_at,
+        item_name_kr: item.item_name_kr,
+        item_name_en: item.item_name_en,
+        model_number: item.model_number,
+        release_price: item.release_price,
+        release_date: item.release_date,
+        images: item.images.map((image) => ({
+          id: image.id,
+          created_at: image.created_at,
+          updated_at: image.updated_at,
+          order: image.order,
+          type: image.type,
+          path: `public/items/${image.path}`,
+        })),
+      };
+    });
+
+    return result;
   }
 }

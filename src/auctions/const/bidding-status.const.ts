@@ -3,4 +3,5 @@ export enum BiddingStatusEnum {
   MATCHED = 'MATCHED',
   COMPLETED = 'COMPLETED',
   CANCELLED = 'CANCELLED',
+  EXPIRED = 'EXPIRED',
 }

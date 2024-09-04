@@ -182,8 +182,6 @@ export class ItemOptionsService {
       .limit(1) // price가 가장 낮은 하나만 가져오기 위해 제한
       .getOne();
 
-    console.log(itemOption);
-
     return itemOption;
   }
 }

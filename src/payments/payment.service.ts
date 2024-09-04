@@ -131,7 +131,6 @@ export class PaymentsService {
     );
 
     const billingKeyInfo = await response.json();
-    console.log(billingKeyInfo);
 
     if (!response.ok)
       throw new InternalServerErrorException(
@@ -144,8 +143,6 @@ export class PaymentsService {
       number: card.methods[0].card.number,
       billingKey: card.billingKey,
     }));
-
-    console.log(cards);
 
     return cards;
   }

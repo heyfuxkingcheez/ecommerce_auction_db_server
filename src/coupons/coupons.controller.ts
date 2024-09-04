@@ -11,10 +11,10 @@ import { TransactionInterceptor } from 'src/common/interceptor/transaction.inter
 import { Roles } from 'src/users/decorator/roles.decorator';
 import { RolesEnum } from 'src/users/const';
 import { CouponDto } from './dto/coupon.dto';
-import { STATUS_CODES } from 'http';
 import { User } from 'src/users/decorator/user.decorator';
 import { QueryRunner } from 'src/common/decorator/query-runner.decorator';
 import { QueryRunner as QR } from 'typeorm';
+import { IsPublic } from 'src/common/decorator/is-public.decorator';
 
 @Controller('coupons')
 export class CouponsController {
@@ -29,10 +29,20 @@ export class CouponsController {
     @Body() dto: CouponDto,
     @QueryRunner() qr: QR,
   ) {
-    console.log(dto.count);
     await this.couponsService.postCoupon(dto, qr);
 
     return { STATUS_CODES: 200, MESSAGE: '쿠폰 등록 완료' };
+  }
+
+  @Get()
+  @IsPublic()
+  async getCoupons() {
+    return await this.couponsService.getCoupons();
+  }
+
+  @Get('me')
+  async getUserCoupons(@User('id') userId: string) {
+    return await this.couponsService.getUserCoupons(userId);
   }
 
   @Get('issue')

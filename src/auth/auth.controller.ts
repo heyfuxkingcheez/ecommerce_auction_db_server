@@ -42,22 +42,25 @@ export class AuthController {
 
     res.cookie('AccessToken', `Bearer ${accessToken}`, {
       // httpOnly: true,
-      secure: false,
-      maxAge: this.configService.get<number>(
-        'JWT_ACCESS_EXP',
-      ),
-
-      sameSite: 'strict',
+      // maxAge: this.configService.get<number>(
+      //   'JWT_ACCESS_EXP',
+      // ),
+      sameSite: 'none',
+      secure: true,
+      // domain: '.woogi.shop',
+      domain: 'localhost',
       path: '/',
     });
 
     res.cookie('RefreshToken', `Bearer ${refreshToken}`, {
       // httpOnly: true,
-      secure: false,
-      maxAge: this.configService.get<number>(
-        'JWT_REFRESH_EXP',
-      ),
-      sameSite: 'strict',
+      // maxAge: this.configService.get<number>(
+      //   'JWT_REFRESH_EXP',
+      // ),
+      sameSite: 'none',
+      secure: true,
+      // domain: '.woogi.shop',
+      domain: 'localhost',
       path: '/',
     });
     res.send({

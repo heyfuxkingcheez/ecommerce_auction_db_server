@@ -82,6 +82,21 @@ export class CouponsService {
         );
       }
 
+      const isIssuedCouponToUser = await userCouponRepo
+        .createQueryBuilder('user_coupon')
+        .innerJoinAndSelect('user_coupon.coupon', 'coupon')
+        .where('user_coupon.userId = :userId', { userId })
+        .andWhere('coupon.coupon_name = :couponName', {
+          couponName,
+        })
+        .getOne();
+
+      if (isIssuedCouponToUser) {
+        throw new BadRequestException(
+          '이미 발급받은 쿠폰 입니다.',
+        );
+      }
+
       const userCoupon = userCouponRepo.create({
         user: {
           id: userId,
@@ -99,8 +114,41 @@ export class CouponsService {
 
       return { STATUS_CODES: 200, MESSAGE: '발급 완료' };
     } catch (error) {
-      console.error(error);
       throw error;
     }
+  }
+
+  async getCoupons(qr?: QueryRunner) {
+    const repo = this.getCouponRepository(qr);
+
+    const coupons = await repo
+      .createQueryBuilder('coupon')
+      .select('coupon.coupon_name')
+      .addSelect('coupon.issued_at')
+      .addSelect('coupon.discount_rate')
+      .addSelect('COUNT(coupon.id)', 'count')
+      .where('coupon.status = :status', {
+        status: CouponStatusEnum.PENDING,
+      })
+      .groupBy('coupon.coupon_name')
+      .addGroupBy('coupon.issued_at')
+      .addGroupBy('coupon.discount_rate')
+      .getRawMany();
+
+    return coupons;
+  }
+
+  async getUserCoupons(userId: string) {
+    const userCoupons =
+      await this.userCouponRepository.find({
+        where: {
+          user: {
+            id: userId,
+          },
+        },
+        relations: ['coupon'],
+      });
+
+    return userCoupons;
   }
 }

@@ -22,6 +22,7 @@ import { QueryRunner } from 'src/common/decorator/query-runner.decorator';
 import { QueryRunner as QR } from 'typeorm';
 import { IsPublic } from 'src/common/decorator/is-public.decorator';
 import { PaginateItemDto } from './dto/paginate-item.dto';
+import { AuctionsService } from 'src/auctions/auctions.service';
 
 @Controller('items')
 export class ItemsController {
@@ -50,7 +51,6 @@ export class ItemsController {
     @QueryRunner() qr?: QR,
   ) {
     const item = await this.itemsService.postItem(dto, qr);
-    console.log(item);
 
     for (let i = 0; i < dto.images.length; i++) {
       await this.imagesService.createItemImage(

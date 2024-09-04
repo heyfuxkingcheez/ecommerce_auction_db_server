@@ -518,4 +518,97 @@ export class AuctionsService {
 
     return result;
   }
+
+  async getUserPurchaseBiddingByUserId(
+    userId: string,
+    status: BiddingStatusEnum,
+    qr?: QueryRunner,
+  ) {
+    const repo = this.getPurchaseBiddingRepository(qr);
+
+    try {
+      const bid = await repo
+        .createQueryBuilder('purchaseBid')
+        .leftJoinAndSelect(
+          'purchaseBid.itemOption',
+          'itemOption',
+        )
+        .leftJoinAndSelect('itemOption.item', 'item')
+        .leftJoinAndSelect('item.images', 'images')
+        .where('purchaseBid.user.id = :userId', { userId })
+        .andWhere('purchaseBid.status = :status', {
+          status,
+        })
+        .orderBy('purchaseBid.id', 'DESC')
+        .getMany();
+
+      return bid;
+    } catch (error) {
+      throw new Error(
+        `입찰 내역을 가져오는 중 오류 발생: ${error.message}`,
+      );
+    }
+  }
+
+  async getUserSaleBiddingByUserId(
+    userId: string,
+    status: BiddingStatusEnum,
+    qr?: QueryRunner,
+  ) {
+    const repo = this.getSaleBiddingRepository(qr);
+
+    try {
+      const bid = await repo
+        .createQueryBuilder('saleBid')
+        .leftJoinAndSelect(
+          'saleBid.itemOption',
+          'itemOption',
+        )
+        .leftJoinAndSelect('itemOption.item', 'item')
+        .leftJoinAndSelect('item.images', 'images')
+        .where('saleBid.user.id = :userId', { userId })
+        .andWhere('saleBid.status = :status', {
+          status,
+        })
+        .orderBy('saleBid.id', 'DESC')
+        .getMany();
+
+      return bid;
+    } catch (error) {
+      throw new Error(
+        `입찰 내역을 가져오는 중 오류 발생: ${error.message}`,
+      );
+    }
+  }
+
+  async getHotItemsInBids(qr?: QueryRunner) {
+    const repo = this.getPurchaseBiddingRepository(qr);
+    const status = BiddingStatusEnum.COMPLETED;
+
+    try {
+      const items = await repo
+        .createQueryBuilder('purchaseBid')
+        .select([
+          'item.id',
+          'item.item_name_kr',
+          'item.item_name_en',
+          'MAX(images.path) as path', // 이미지 경로 중 하나만 선택
+          'MIN(purchaseBid.price) as price', // 가격 중 하나만 선택
+          'COUNT(purchaseBid.id) as item_count',
+        ])
+        .leftJoin('purchaseBid.itemOption', 'itemOption')
+        .leftJoin('itemOption.item', 'item')
+        .leftJoin('item.images', 'images')
+        .where('purchaseBid.status = :status', { status })
+        .groupBy('item.id')
+        .orderBy('item_count', 'DESC')
+        .getRawMany();
+
+      return items;
+    } catch (error) {
+      throw new Error(
+        `거래 많은 아이템 리스트를 가져오는 중 오류 발생: ${error.message}`,
+      );
+    }
+  }
 }

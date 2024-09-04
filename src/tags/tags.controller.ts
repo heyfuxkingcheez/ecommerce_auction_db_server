@@ -1,6 +1,8 @@
 import {
   Body,
   Controller,
+  Get,
+  Param,
   Post,
   UseInterceptors,
 } from '@nestjs/common';
@@ -10,6 +12,7 @@ import { TagItemDto } from './dto/tag-item.dto';
 import { TransactionInterceptor } from 'src/common/interceptor/transaction.interceptor';
 import { QueryRunner } from 'src/common/decorator/query-runner.decorator';
 import { QueryRunner as QR } from 'typeorm';
+import { IsPublic } from 'src/common/decorator/is-public.decorator';
 
 @Controller('tags')
 export class TagsController {
@@ -27,5 +30,11 @@ export class TagsController {
     @QueryRunner() qr?: QR,
   ) {
     return await this.tagsService.postTagItem(dto, qr);
+  }
+
+  @Get('/items/:tagName')
+  @IsPublic()
+  async getTagHaveItems(@Param('tagName') tagName: string) {
+    return await this.tagsService.getTagsHaveItems(tagName);
   }
 }

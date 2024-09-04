@@ -55,6 +55,9 @@ import { TagsModule } from './tags/tags.module';
         autoLoadEntities: true,
         synchronize:
           configService.get<string>('RUNTIME') !== 'prod',
+        ssl: {
+          rejectUnauthorized: false,
+        },
         // logging: true,
       }),
     }),
