@@ -64,7 +64,9 @@ import { TagsModule } from './tags/tags.module';
     BullModule.forRootAsync({
       useFactory: async (configService: ConfigService) => ({
         redis: {
-          host: 'redis_bull',
+          host: configService.get<string>(
+            'REDIS_BULL_HOST',
+          ),
           port: configService.get<number>(
             'REDIS_BULL_PORT',
           ),
