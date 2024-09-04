@@ -122,6 +122,7 @@ services:
       - .env
     networks:
       - backend
-  # networks:
+
+networks:
   backend:
     driver: bridge
