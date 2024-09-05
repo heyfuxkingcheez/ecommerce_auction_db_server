@@ -36,4 +36,4 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd ecommerce_auction_db_server
-            docker ps
+            sudo docker ps
