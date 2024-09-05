@@ -8,11 +8,16 @@ import Redlock from 'redlock';
   providers: [
     {
       provide: 'Redlock',
-      useFactory: (configService: ConfigService) => {
+      useFactory: async (configService: ConfigService) => {
         const redisLocks = [1, 2, 3, 4, 5].map(
           (i) =>
             new Redis({
-              path: `redis://${configService.get<string>(`REDIS_LOCK${i}_HOST`)}:${configService.get<number>(`REDIS_LOCK${i}_PORT`)}`,
+              host: configService.get<string>(
+                `REDIS_LOCK${i}_HOST`,
+              ),
+              port: configService.get<number>(
+                `REDIS_LOCK${i}_PORT`,
+              ),
             }),
         );
 
