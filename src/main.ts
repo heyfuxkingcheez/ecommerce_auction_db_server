@@ -28,15 +28,6 @@ function deleteOldFiles() {
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // app.setGlobalPrefix('api');
-  // app.enableCors({
-  //   origin: [
-  //     'localhost:3001',
-  //     'localhost:80',
-  //     'localhost:443',
-  //   ],
-  //   credentials: true,
-  // });
   app.use(cookieParser());
   app.useGlobalPipes(
     new ValidationPipe({
