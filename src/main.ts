@@ -39,7 +39,6 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
     }),
   );
-  console.log('오우오우');
 
   const configService = app.get(ConfigService);
   const port = configService.get<number>('PORT');
