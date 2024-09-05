@@ -2,7 +2,7 @@ name: CD Pipeline
 
 on:
   workflow_run:
-    workflows: ["Docker Image CI"]
+    workflows: ['Docker Image CI']
     types:
       - completed
 
@@ -26,7 +26,7 @@ jobs:
             sudo su -  
             docker-compose down  
             docker-compose pull 
-            docker-compose up -d  
+            docker-compose up -d
 
       # 2. 배포 완료 후 로그 확인 (선택 사항)
       - name: Check logs
