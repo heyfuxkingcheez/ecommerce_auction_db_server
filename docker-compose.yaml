@@ -21,14 +21,7 @@ services:
     env_file:
       - .env
     restart: always
-    command:
-      [
-        'redis-server',
-        '--bind',
-        '0.0.0.0',
-        '--protected-mode',
-        'no',
-      ]
+    command: ['redis-server', '--protected-mode', 'no']
     networks:
       - backend
 
