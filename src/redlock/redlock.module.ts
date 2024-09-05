@@ -12,7 +12,9 @@ import Redlock from 'redlock';
         const redisLocks = [1, 2, 3, 4, 5].map(
           (i) =>
             new Redis({
-              host: 'localhost',
+              host: configService.get<string>(
+                `REDIS_LOCK${i}_HOST`,
+              ),
               port: configService.get<number>(
                 `REDIS_LOCK${i}_PORT`,
               ),
