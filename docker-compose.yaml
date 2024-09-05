@@ -15,19 +15,19 @@ services:
     image: redis:latest
     container_name: redis_bull
     ports:
-      - '${REDIS_BULL_PORT}:6379'
+      - ${REDIS_BULL_PORT}:6379
     volumes:
       - ./redis_data/bull:/data
     env_file:
       - .env
     restart: always
-    entrypoint:
+    command:
       [
         'redis-server',
-        '--appendonly',
-        'yes',
         '--bind',
         '0.0.0.0',
+        '--protected-mode',
+        'no',
       ]
     networks:
       - backend
@@ -37,19 +37,19 @@ services:
     image: redis:latest
     container_name: redis_lock1
     ports:
-      - '${REDIS_LOCK1_PORT}:6379'
+      - ${REDIS_LOCK1_PORT}:6379
     volumes:
       - ./redis_data/lock:/data
     env_file:
       - .env
     restart: always
-    entrypoint:
+    command:
       [
         'redis-server',
-        '--appendonly',
-        'yes',
         '--bind',
         '0.0.0.0',
+        '--protected-mode',
+        'no',
       ]
     networks:
       - backend
@@ -58,19 +58,19 @@ services:
     image: redis:latest
     container_name: redis_lock2
     ports:
-      - '${REDIS_LOCK2_PORT}:6379'
+      - ${REDIS_LOCK2_PORT}:6379
     volumes:
       - ./redis_data/lock:/data
     env_file:
       - .env
     restart: always
-    entrypoint:
+    command:
       [
         'redis-server',
-        '--appendonly',
-        'yes',
         '--bind',
         '0.0.0.0',
+        '--protected-mode',
+        'no',
       ]
     networks:
       - backend
@@ -79,19 +79,19 @@ services:
     image: redis:latest
     container_name: redis_lock3
     ports:
-      - '${REDIS_LOCK3_PORT}:6379'
+      - ${REDIS_LOCK3_PORT}:6379
     volumes:
       - ./redis_data/lock:/data
     env_file:
       - .env
     restart: always
-    entrypoint:
+    command:
       [
         'redis-server',
-        '--appendonly',
-        'yes',
         '--bind',
         '0.0.0.0',
+        '--protected-mode',
+        'no',
       ]
     networks:
       - backend
@@ -100,19 +100,19 @@ services:
     image: redis:latest
     container_name: redis_lock4
     ports:
-      - '${REDIS_LOCK4_PORT}:6379'
+      - ${REDIS_LOCK4_PORT}:6379
     volumes:
       - ./redis_data/lock:/data
     env_file:
       - .env
     restart: always
-    entrypoint:
+    command:
       [
         'redis-server',
-        '--appendonly',
-        'yes',
         '--bind',
         '0.0.0.0',
+        '--protected-mode',
+        'no',
       ]
     networks:
       - backend
@@ -121,19 +121,19 @@ services:
     image: redis:latest
     container_name: redis_lock5
     ports:
-      - '${REDIS_LOCK5_PORT}:6379'
+      - ${REDIS_LOCK5_PORT}:6379
     volumes:
       - ./redis_data/lock:/data
     env_file:
       - .env
     restart: always
-    entrypoint:
+    command:
       [
         'redis-server',
-        '--appendonly',
-        'yes',
         '--bind',
         '0.0.0.0',
+        '--protected-mode',
+        'no',
       ]
     networks:
       - backend
@@ -159,11 +159,18 @@ services:
     container_name: ecommerce_auction_backend
     restart: always
     ports:
-      - '${PORT}:${PORT}'
+      - ${PORT}:${PORT}
     env_file:
       - .env
     networks:
       - backend
+    depends_on:
+      - redis_lock1
+      - redis_lock2
+      - redis_lock3
+      - redis_lock4
+      - redis_lock5
+      - redis_bull
 
 networks:
   backend:

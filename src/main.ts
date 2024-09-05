@@ -30,12 +30,7 @@ async function bootstrap() {
 
   // app.setGlobalPrefix('api');
   app.enableCors({
-    origin: [
-      'https://www.woogi.shop',
-      'http://localhost:3001',
-      'http://localhost:443',
-      'http://localhost:80',
-    ],
+    origin: 'http://localhost:80',
     credentials: true,
   });
   app.use(cookieParser());
