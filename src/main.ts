@@ -28,6 +28,12 @@ function deleteOldFiles() {
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  app.enableCors({
+    origin: 'http://localhost:3001',
+    methods: 'GET,POST,PUT,DELETE,OPTIONS', // 허용할 HTTP 메서드
+    allowedHeaders: 'Authorization, Content-Type', // 허용할 헤더
+    credentials: true,
+  });
   app.use(cookieParser());
   app.useGlobalPipes(
     new ValidationPipe({

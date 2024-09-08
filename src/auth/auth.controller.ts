@@ -41,7 +41,6 @@ export class AuthController {
       await this.authService.loginWithEmail(credentials);
 
     res.cookie('AccessToken', `Bearer ${accessToken}`, {
-      httpOnly: true,
       maxAge: this.configService.get<number>(
         'JWT_ACCESS_EXP',
       ),
@@ -53,7 +52,6 @@ export class AuthController {
     });
 
     res.cookie('RefreshToken', `Bearer ${refreshToken}`, {
-      httpOnly: true,
       maxAge: this.configService.get<number>(
         'JWT_REFRESH_EXP',
       ),

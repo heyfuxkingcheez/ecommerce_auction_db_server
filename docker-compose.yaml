@@ -10,14 +10,14 @@ services:
   #     POSTGRES_USER: ${DB_USERNAME}
   #     POSTGRES_PASSWORD: ${DB_PASSWORD}
   #     POSTGRES_DB: ${DB_DATABASE}
-  ## Queue
+  # Queue
   redis_bull:
     image: redis:latest
     container_name: redis_bull
     ports:
       - ${REDIS_BULL_PORT}:${REDIS_BULL_PORT}
-    volumes:
-      - ./redis_data/bull:/data
+    # volumes:
+    #   - ./redis_data/bull:/data
     env_file:
       - .env
     restart: always
@@ -31,8 +31,6 @@ services:
         '--protected-mode',
         'no',
       ]
-    networks:
-      - backend
 
   ## Red lock
   redis_lock1:
@@ -40,8 +38,8 @@ services:
     container_name: redis_lock1
     ports:
       - ${REDIS_LOCK1_PORT}:${REDIS_LOCK1_PORT}
-    volumes:
-      - ./redis_data/lock:/data
+    # volumes:
+    #   - ./redis_data/lock:/data
     env_file:
       - .env
     restart: always
@@ -55,16 +53,14 @@ services:
         '--protected-mode',
         'no',
       ]
-    networks:
-      - backend
 
   redis_lock2:
     image: redis:latest
     container_name: redis_lock2
     ports:
       - ${REDIS_LOCK2_PORT}:${REDIS_LOCK2_PORT}
-    volumes:
-      - ./redis_data/lock:/data
+    # volumes:
+    #   - ./redis_data/lock:/data
     env_file:
       - .env
     restart: always
@@ -78,16 +74,14 @@ services:
         '--protected-mode',
         'no',
       ]
-    networks:
-      - backend
 
   redis_lock3:
     image: redis:latest
     container_name: redis_lock3
     ports:
       - ${REDIS_LOCK3_PORT}:${REDIS_LOCK3_PORT}
-    volumes:
-      - ./redis_data/lock:/data
+    # volumes:
+    #   - ./redis_data/lock:/data
     env_file:
       - .env
     restart: always
@@ -101,16 +95,14 @@ services:
         '--protected-mode',
         'no',
       ]
-    networks:
-      - backend
 
   redis_lock4:
     image: redis:latest
     container_name: redis_lock4
     ports:
       - ${REDIS_LOCK4_PORT}:${REDIS_LOCK4_PORT}
-    volumes:
-      - ./redis_data/lock:/data
+    # volumes:
+    #   - ./redis_data/lock:/data
     env_file:
       - .env
     restart: always
@@ -124,16 +116,14 @@ services:
         '--protected-mode',
         'no',
       ]
-    networks:
-      - backend
 
   redis_lock5:
     image: redis:latest
     container_name: redis_lock5
     ports:
       - ${REDIS_LOCK5_PORT}:${REDIS_LOCK5_PORT}
-    volumes:
-      - ./redis_data/lock:/data
+    # volumes:
+    #   - ./redis_data/lock:/data
     env_file:
       - .env
     restart: always
@@ -147,43 +137,26 @@ services:
         '--protected-mode',
         'no',
       ]
-    networks:
-      - backend
 
   ## NginX
-  nginx:
-    image: nginx:1.27.1
-    container_name: nginx
-    environment:
-      - TZ=Asia/Seoul
-    ports:
-      - 80:80
-      - 443:443
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-    restart: always
-    networks:
-      - backend
+  # nginx:
+  #   image: nginx:1.27.1
+  #   container_name: nginx
+  #   environment:
+  #     - TZ=Asia/Seoul
+  #   ports:
+  #     - 80:80
+  #     - 443:443
+  #   volumes:
+  #     - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+  #   restart: always
+  #   networks:
+  #     - backend
 
   ## Backend
-  app:
-    image: woogionandon/ecommerce_auction_backend:latest
-    container_name: ecommerce_auction_backend
-    restart: always
-    ports:
-      - ${PORT}:${PORT}
-    env_file:
-      - .env
-    networks:
-      - backend
-    depends_on:
-      - redis_lock1
-      - redis_lock2
-      - redis_lock3
-      - redis_lock4
-      - redis_lock5
-      - redis_bull
-
-networks:
-  backend:
-    driver: bridge
+  # app:
+  #   image: woogionandon/ecommerce_auction_backend:latest
+  #   container_name: ecommerce_auction_backend
+  #   restart: always
+  #   env_file:
+  #     - .env
