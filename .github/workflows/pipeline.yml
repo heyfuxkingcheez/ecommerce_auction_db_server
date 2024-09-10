@@ -24,6 +24,31 @@ jobs:
           script: |
             cd ecommerce_auction_db_server
 
+            echo "DB_HOST=${{ secrets.DB_HOST }}" > .env
+            echo "DB_PORT=${{ secrets.DB_PORT }}" >> .env
+            echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> .env
+            echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+            echo "DB_DATABASE=${{ secrets.DB_DATABASE }}" >> .env
+            echo "PORT=${{ secrets.PORT }}" >> .env
+            echo "HOST=${{ secrets.HOST }}" >> .env
+            echo "RUNTIME=${{ secrets.RUNTIME }}" >> .env
+            echo "SERVICE_NAME=${{ secrets.SERVICE_NAME }}" >> .env
+            echo "URL=${{ secrets.URL }}" >> .env
+            echo "HASH_ROUNDS=${{ secrets.HASH_ROUNDS }}" >> .env
+            echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
+            echo "JWT_ACCESS_EXP=${{ secrets.JWT_ACCESS_EXP }}" >> .env
+            echo "JWT_REFRESH_EXP=${{ secrets.JWT_REFRESH_EXP }}" >> .env
+            echo "API_SECRET=${{ secrets.API_SECRET }}" >> .env
+            echo "CHANNEL_KEY=${{ secrets.CHANNEL_KEY }}" >> .env
+            echo "REDIS_HOST=${{ secrets.REDIS_HOST }}" >> .env
+            echo "REDIS_LOCK1_PORT=${{ secrets.REDIS_LOCK1_PORT }}" >> .env
+            echo "REDIS_LOCK2_PORT=${{ secrets.REDIS_LOCK2_PORT }}" >> .env
+            echo "REDIS_LOCK3_PORT=${{ secrets.REDIS_LOCK3_PORT }}" >> .env
+            echo "REDIS_LOCK4_PORT=${{ secrets.REDIS_LOCK4_PORT }}" >> .env
+            echo "REDIS_LOCK5_PORT=${{ secrets.REDIS_LOCK5_PORT }}" >> .env
+            echo "REDIS_BULL_PORT=${{ secrets.REDIS_BULL_PORT }}" >> .env
+            echo "JUSO_API_KEY=${{ secrets.JUSO_API_KEY }}" >> .env
+
             sudo docker-compose down  
             sudo docker-compose pull 
             sudo docker-compose up -d
