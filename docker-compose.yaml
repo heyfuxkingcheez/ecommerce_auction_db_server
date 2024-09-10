@@ -10,135 +10,136 @@ services:
   #     POSTGRES_USER: ${DB_USERNAME}
   #     POSTGRES_PASSWORD: ${DB_PASSWORD}
   #     POSTGRES_DB: ${DB_DATABASE}
+
   # Queue
-  # redis_bull:
-  #   image: redis:latest
-  #   container_name: redis_bull
-  #   ports:
-  #     - ${REDIS_BULL_PORT}:${REDIS_BULL_PORT}
-  #   # volumes:
-  #   #   - ./redis_data/bull:/data
-  #   env_file:
-  #     - .env
-  #   restart: always
-  #   command:
-  #     [
-  #       'redis-server',
-  #       '--port',
-  #       '${REDIS_BULL_PORT}',
-  #       '--bind',
-  #       '0.0.0.0',
-  #       '--protected-mode',
-  #       'no',
-  #     ]
+  redis_bull:
+    image: redis:latest
+    container_name: ${REDIS_BULL_HOST}
+    ports:
+      - ${REDIS_BULL_PORT}:${REDIS_BULL_PORT}
+    # volumes:
+    #   - ./redis_data/bull:/data
+    env_file:
+      - .env
+    restart: always
+    command:
+      [
+        'redis-server',
+        '--port',
+        '${REDIS_BULL_PORT}',
+        '--bind',
+        '0.0.0.0',
+        '--protected-mode',
+        'no',
+      ]
 
-  # ## Red lock
-  # redis_lock1:
-  #   image: redis:latest
-  #   container_name: redis_lock1
-  #   ports:
-  #     - ${REDIS_LOCK1_PORT}:${REDIS_LOCK1_PORT}
-  #   # volumes:
-  #   #   - ./redis_data/lock:/data
-  #   env_file:
-  #     - .env
-  #   restart: always
-  #   command:
-  #     [
-  #       'redis-server',
-  #       '--port',
-  #       '${REDIS_LOCK1_PORT}',
-  #       '--bind',
-  #       '0.0.0.0',
-  #       '--protected-mode',
-  #       'no',
-  #     ]
+  ## Red lock
+  redis_lock1:
+    image: redis:latest
+    container_name: ${REDIS_LOCK1_HOST}
+    ports:
+      - ${REDIS_LOCK1_PORT}:${REDIS_LOCK1_PORT}
+    # volumes:
+    #   - ./redis_data/lock:/data
+    env_file:
+      - .env
+    restart: always
+    command:
+      [
+        'redis-server',
+        '--port',
+        '${REDIS_LOCK1_PORT}',
+        '--bind',
+        '0.0.0.0',
+        '--protected-mode',
+        'no',
+      ]
 
-  # redis_lock2:
-  #   image: redis:latest
-  #   container_name: redis_lock2
-  #   ports:
-  #     - ${REDIS_LOCK2_PORT}:${REDIS_LOCK2_PORT}
-  #   # volumes:
-  #   #   - ./redis_data/lock:/data
-  #   env_file:
-  #     - .env
-  #   restart: always
-  #   command:
-  #     [
-  #       'redis-server',
-  #       '--port',
-  #       '${REDIS_LOCK2_PORT}',
-  #       '--bind',
-  #       '0.0.0.0',
-  #       '--protected-mode',
-  #       'no',
-  #     ]
+  redis_lock2:
+    image: redis:latest
+    container_name: ${REDIS_LOCK2_HOST}
+    ports:
+      - ${REDIS_LOCK2_PORT}:${REDIS_LOCK2_PORT}
+    # volumes:
+    #   - ./redis_data/lock:/data
+    env_file:
+      - .env
+    restart: always
+    command:
+      [
+        'redis-server',
+        '--port',
+        '${REDIS_LOCK2_PORT}',
+        '--bind',
+        '0.0.0.0',
+        '--protected-mode',
+        'no',
+      ]
 
-  # redis_lock3:
-  #   image: redis:latest
-  #   container_name: redis_lock3
-  #   ports:
-  #     - ${REDIS_LOCK3_PORT}:${REDIS_LOCK3_PORT}
-  #   # volumes:
-  #   #   - ./redis_data/lock:/data
-  #   env_file:
-  #     - .env
-  #   restart: always
-  #   command:
-  #     [
-  #       'redis-server',
-  #       '--port',
-  #       '${REDIS_LOCK3_PORT}',
-  #       '--bind',
-  #       '0.0.0.0',
-  #       '--protected-mode',
-  #       'no',
-  #     ]
+  redis_lock3:
+    image: redis:latest
+    container_name: ${REDIS_LOCK3_HOST}
+    ports:
+      - ${REDIS_LOCK3_PORT}:${REDIS_LOCK3_PORT}
+    # volumes:
+    #   - ./redis_data/lock:/data
+    env_file:
+      - .env
+    restart: always
+    command:
+      [
+        'redis-server',
+        '--port',
+        '${REDIS_LOCK3_PORT}',
+        '--bind',
+        '0.0.0.0',
+        '--protected-mode',
+        'no',
+      ]
 
-  # redis_lock4:
-  #   image: redis:latest
-  #   container_name: redis_lock4
-  #   ports:
-  #     - ${REDIS_LOCK4_PORT}:${REDIS_LOCK4_PORT}
-  #   # volumes:
-  #   #   - ./redis_data/lock:/data
-  #   env_file:
-  #     - .env
-  #   restart: always
-  #   command:
-  #     [
-  #       'redis-server',
-  #       '--port',
-  #       '${REDIS_LOCK4_PORT}',
-  #       '--bind',
-  #       '0.0.0.0',
-  #       '--protected-mode',
-  #       'no',
-  #     ]
+  redis_lock4:
+    image: redis:latest
+    container_name: ${REDIS_LOCK4_HOST}
+    ports:
+      - ${REDIS_LOCK4_PORT}:${REDIS_LOCK4_PORT}
+    # volumes:
+    #   - ./redis_data/lock:/data
+    env_file:
+      - .env
+    restart: always
+    command:
+      [
+        'redis-server',
+        '--port',
+        '${REDIS_LOCK4_PORT}',
+        '--bind',
+        '0.0.0.0',
+        '--protected-mode',
+        'no',
+      ]
 
-  # redis_lock5:
-  #   image: redis:latest
-  #   container_name: redis_lock5
-  #   ports:
-  #     - ${REDIS_LOCK5_PORT}:${REDIS_LOCK5_PORT}
-  #   # volumes:
-  #   #   - ./redis_data/lock:/data
-  #   env_file:
-  #     - .env
-  #   restart: always
-  #   command:
-  #     [
-  #       'redis-server',
-  #       '--port',
-  #       '${REDIS_LOCK5_PORT}',
-  #       '--bind',
-  #       '0.0.0.0',
-  #       '--protected-mode',
-  #       'no',
-  #     ]
+  redis_lock5:
+    image: redis:latest
+    container_name: ${REDIS_LOCK5_HOST}
+    ports:
+      - ${REDIS_LOCK5_PORT}:${REDIS_LOCK5_PORT}
+    # volumes:
+    #   - ./redis_data/lock:/data
+    env_file:
+      - .env
+    restart: always
+    command:
+      [
+        'redis-server',
+        '--port',
+        '${REDIS_LOCK5_PORT}',
+        '--bind',
+        '0.0.0.0',
+        '--protected-mode',
+        'no',
+      ]
 
-  ## NginX
+  # NginX
   # nginx:
   #   image: nginx:1.27.1
   #   container_name: nginx
@@ -157,6 +158,8 @@ services:
   app:
     image: woogionandon/ecommerce_auction_backend:latest
     container_name: ecommerce_auction_backend
+    ports:
+      - ${PORT}:${PORT}
     restart: always
     env_file:
       - .env
