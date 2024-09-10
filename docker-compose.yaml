@@ -14,7 +14,7 @@ services:
   # Queue
   redis_bull:
     image: redis:latest
-    container_name: ${REDIS_BULL_HOST}
+    container_name: redis_bull
     ports:
       - ${REDIS_BULL_PORT}:${REDIS_BULL_PORT}
     # volumes:
@@ -36,7 +36,7 @@ services:
   ## Red lock
   redis_lock1:
     image: redis:latest
-    container_name: ${REDIS_LOCK1_HOST}
+    container_name: redis_lock1
     ports:
       - ${REDIS_LOCK1_PORT}:${REDIS_LOCK1_PORT}
     # volumes:
@@ -57,7 +57,7 @@ services:
 
   redis_lock2:
     image: redis:latest
-    container_name: ${REDIS_LOCK2_HOST}
+    container_name: redis_lock2
     ports:
       - ${REDIS_LOCK2_PORT}:${REDIS_LOCK2_PORT}
     # volumes:
@@ -78,7 +78,7 @@ services:
 
   redis_lock3:
     image: redis:latest
-    container_name: ${REDIS_LOCK3_HOST}
+    container_name: redis_lock3
     ports:
       - ${REDIS_LOCK3_PORT}:${REDIS_LOCK3_PORT}
     # volumes:
@@ -99,7 +99,7 @@ services:
 
   redis_lock4:
     image: redis:latest
-    container_name: ${REDIS_LOCK4_HOST}
+    container_name: redis_lock4
     ports:
       - ${REDIS_LOCK4_PORT}:${REDIS_LOCK4_PORT}
     # volumes:
@@ -120,7 +120,7 @@ services:
 
   redis_lock5:
     image: redis:latest
-    container_name: ${REDIS_LOCK5_HOST}
+    container_name: redis_lock5
     ports:
       - ${REDIS_LOCK5_PORT}:${REDIS_LOCK5_PORT}
     # volumes:
