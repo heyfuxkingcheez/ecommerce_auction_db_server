@@ -16,9 +16,7 @@ services:
     image: redis:latest
     container_name: redis_bull
     ports:
-      - ${REDIS_BULL_PORT}:${REDIS_BULL_PORT}
-    # volumes:
-    #   - ./redis_data/bull:/data
+      - '${REDIS_BULL_PORT}:6379'
     env_file:
       - .env
     restart: always
@@ -38,9 +36,7 @@ services:
     image: redis:latest
     container_name: redis_lock1
     ports:
-      - ${REDIS_LOCK1_PORT}:${REDIS_LOCK1_PORT}
-    # volumes:
-    #   - ./redis_data/lock:/data
+      - '${REDIS_LOCK1_PORT}:6379'
     env_file:
       - .env
     restart: always
@@ -59,9 +55,7 @@ services:
     image: redis:latest
     container_name: redis_lock2
     ports:
-      - ${REDIS_LOCK2_PORT}:${REDIS_LOCK2_PORT}
-    # volumes:
-    #   - ./redis_data/lock:/data
+      - '${REDIS_LOCK2_PORT}:6379'
     env_file:
       - .env
     restart: always
@@ -80,9 +74,7 @@ services:
     image: redis:latest
     container_name: redis_lock3
     ports:
-      - ${REDIS_LOCK3_PORT}:${REDIS_LOCK3_PORT}
-    # volumes:
-    #   - ./redis_data/lock:/data
+      - '${REDIS_LOCK3_PORT}:6379'
     env_file:
       - .env
     restart: always
@@ -101,9 +93,7 @@ services:
     image: redis:latest
     container_name: redis_lock4
     ports:
-      - ${REDIS_LOCK4_PORT}:${REDIS_LOCK4_PORT}
-    # volumes:
-    #   - ./redis_data/lock:/data
+      - '${REDIS_LOCK4_PORT}:6379'
     env_file:
       - .env
     restart: always
@@ -122,9 +112,7 @@ services:
     image: redis:latest
     container_name: redis_lock5
     ports:
-      - ${REDIS_LOCK5_PORT}:${REDIS_LOCK5_PORT}
-    # volumes:
-    #   - ./redis_data/lock:/data
+      - '${REDIS_LOCK5_PORT}:6379'
     env_file:
       - .env
     restart: always
