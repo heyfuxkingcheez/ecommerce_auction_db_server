@@ -44,10 +44,9 @@ export class AuthController {
       maxAge: this.configService.get<number>(
         'JWT_ACCESS_EXP',
       ),
-      sameSite: 'none',
+      sameSite: 'strict',
       secure: true,
-      // domain: '.woogi.shop',
-      domain: 'localhost',
+      domain: '.woogi.shop',
       path: '/',
     });
 
@@ -55,10 +54,9 @@ export class AuthController {
       maxAge: this.configService.get<number>(
         'JWT_REFRESH_EXP',
       ),
-      sameSite: 'none',
+      sameSite: 'strict',
       secure: true,
-      // domain: '.woogi.shop',
-      domain: 'localhost',
+      domain: '.woogi.shop',
       path: '/',
     });
     res.send({
