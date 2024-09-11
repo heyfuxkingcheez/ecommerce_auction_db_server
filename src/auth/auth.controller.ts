@@ -70,8 +70,39 @@ export class AuthController {
 
   @Post('register')
   @IsPublic()
-  postRegisterEmail(@Body() dto: RegisterUserDto) {
-    return this.authService.registerWithEmail(dto);
+  async postRegisterEmail(
+    @Body() dto: RegisterUserDto,
+    @Res() res: Response,
+  ) {
+    const { accessToken, refreshToken } =
+      await this.authService.registerWithEmail(dto);
+
+    res.cookie('AccessToken', `Bearer ${accessToken}`, {
+      maxAge: this.configService.get<number>(
+        'JWT_ACCESS_EXP',
+      ),
+      sameSite: 'strict',
+      secure: true,
+      domain: '.woogi.shop',
+      path: '/',
+    });
+
+    res.cookie('RefreshToken', `Bearer ${refreshToken}`, {
+      maxAge: this.configService.get<number>(
+        'JWT_REFRESH_EXP',
+      ),
+      sameSite: 'strict',
+      secure: true,
+      domain: '.woogi.shop',
+      path: '/',
+    });
+    res.send({
+      STATUS_CODES: 200,
+      MESSAGE: '로그인 성공',
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+    });
+    return;
   }
 
   @Post('token/access')

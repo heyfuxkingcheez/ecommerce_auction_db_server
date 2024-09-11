@@ -32,7 +32,7 @@ export class AuthService {
       password: hash,
     });
 
-    return newUser;
+    return this.loginUser(newUser);
   }
 
   loginUser(user: Pick<UserModel, 'email' | 'id'>) {
