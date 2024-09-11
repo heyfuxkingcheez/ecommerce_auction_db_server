@@ -33,7 +33,10 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.enableCors({
-    origin: 'https://woogi.shop:443',
+    origin: [
+      'https://www.woogi.shop',
+      'https://woogi.shop',
+    ],
     methods: 'GET,POST,PUT,DELETE,OPTIONS', // 허용할 HTTP 메서드
     allowedHeaders: 'Authorization, Content-Type', // 허용할 헤더
     credentials: true,
