@@ -13,10 +13,6 @@ function deleteOldFiles() {
   const files = fs.readdirSync(TEMP_FOLDER_PATH);
   const now = Date.now();
 
-  if (!fs.existsSync(TEMP_FOLDER_PATH)) {
-    fs.mkdirSync(TEMP_FOLDER_PATH, { recursive: true });
-  }
-
   files.forEach((file) => {
     const filePath = path.join(TEMP_FOLDER_PATH, file);
     const stats = fs.statSync(filePath);
@@ -33,7 +29,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.enableCors({
-    origin: 'https://woogi.shop',
+    origin: ['https://woogi.shop'],
     methods: 'GET,POST,PUT,DELETE,OPTIONS', // 허용할 HTTP 메서드
     allowedHeaders: 'Authorization, Content-Type', // 허용할 헤더
     credentials: true,

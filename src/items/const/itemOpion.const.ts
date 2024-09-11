@@ -21,5 +21,6 @@ export enum ItemOptionEnum {
   US_9 = '9',
   US_10 = '10',
   US_11 = '11',
-  US_12 = ' 12',
+  US_12 = '12',
+  ONESIZE = 'ONESIZE',
 }
