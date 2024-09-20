@@ -268,6 +268,8 @@ export class AuctionsService {
           this.updatePurchaseBidStatus(purchaseBid.id, qr),
         ]);
 
+        await lock.release();
+
         await Promise.all([
           this.sseService.emitEvent(
             saleBid.user.id,
