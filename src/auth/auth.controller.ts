@@ -47,6 +47,7 @@ export class AuthController {
       sameSite: 'strict',
       secure: true,
       domain: '.woogi.shop',
+      // domain: 'localhost',
       path: '/',
     });
 
@@ -57,6 +58,7 @@ export class AuthController {
       sameSite: 'strict',
       secure: true,
       domain: '.woogi.shop',
+      // domain: 'localhost',
       path: '/',
     });
     res.send({

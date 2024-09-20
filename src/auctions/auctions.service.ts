@@ -227,21 +227,20 @@ export class AuctionsService {
       2000,
     );
     try {
-      const saleBid =
-        await this.findBidByItemOptionAndPrice(
+      const [saleBid, purchaseBid] = await Promise.all([
+        this.findBidByItemOptionAndPrice(
           itemOptionId,
           price,
           false,
           qr,
-        );
-
-      const purchaseBid =
-        await this.findBidByItemOptionAndPrice(
+        ),
+        this.findBidByItemOptionAndPrice(
           itemOptionId,
           price,
           true,
           qr,
-        );
+        ),
+      ]);
 
       if (saleBid && purchaseBid) {
         if (
@@ -262,22 +261,24 @@ export class AuctionsService {
             price: saleBid.price,
           });
         }
-        await this.updateSaleBidStatus(saleBid.id, qr);
 
-        await this.updatePurchaseBidStatus(
-          purchaseBid.id,
-          qr,
-        );
+        await Promise.all([
+          this.updateSaleBidStatus(saleBid.id, qr),
 
-        this.sseService.emitEvent(
-          saleBid.user.id,
-          `판매 완료_${saleBid.itemOption}[${saleBid.itemOption.option}]:판매 입찰이 체결되었습니다.`,
-        );
+          this.updatePurchaseBidStatus(purchaseBid.id, qr),
+        ]);
 
-        this.sseService.emitEvent(
-          purchaseBid.user.id,
-          `구매 완료_${purchaseBid.itemOption}[${purchaseBid.itemOption.option}]:구매 입찰이 체결되었습니다.`,
-        );
+        await Promise.all([
+          this.sseService.emitEvent(
+            saleBid.user.id,
+            `판매 완료_${saleBid.itemOption}[${saleBid.itemOption.option}]:판매 입찰이 체결되었습니다.`,
+          ),
+
+          this.sseService.emitEvent(
+            purchaseBid.user.id,
+            `구매 완료_${purchaseBid.itemOption}[${purchaseBid.itemOption.option}]:구매 입찰이 체결되었습니다.`,
+          ),
+        ]);
 
         await this.matchingBids(
           purchaseBid.id,
