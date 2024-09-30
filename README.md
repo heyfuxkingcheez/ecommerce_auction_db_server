@@ -17,7 +17,7 @@
 
 ## 서비스 아키텍처
 
-![Service Architecture.jpg](https://prod-files-secure.s3.us-west-2.amazonaws.com/a5b6105b-2c9c-44a4-91ca-fee26b2c2da7/503f334b-d85c-4462-ad90-de1a875c80e1/Service_Architecture.jpg)
+![Service Architecture](https://github.com/user-attachments/assets/6caa0693-0266-4e60-aad8-3c97cedf4656)
 
 ## ERD
 
