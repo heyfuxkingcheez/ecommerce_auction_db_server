@@ -19,7 +19,6 @@ import {
 } from 'src/common/validation-message';
 import {
   IsEmail,
-  IsNumber,
   IsPhoneNumber,
   IsString,
   Length,
